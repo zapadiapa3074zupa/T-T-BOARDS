@@ -1,213 +1,201 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Through & Through</title>
+<style>
+body { margin:0; font-family: Arial; background:#000; color:#fff; }
+header { text-align:center; padding:20px; }
+nav { display:flex; justify-content:center; gap:30px; margin-bottom:20px; }
+button { cursor:pointer; }
+.card { border:1px solid #fff; padding:10px; margin:10px; }
+.selected { background:#fff; color:#000; }
+#cartPanel { position:fixed; right:0; top:0; width:300px; height:100%; background:#fff; color:#000; padding:10px; display:none; }
+#loginModal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; }
+#loginBox { background:#fff; color:#000; padding:20px; }
+.admin { border:1px solid #fff; padding:10px; margin:10px; }
+</style>
+</head>
+<body><header>
+<h1 id="title">THROUGH & THROUGH</h1>
+<p id="subtitle">built for riders</p>
+</header><nav>
+<button onclick="showTab('home')">Home</button>
+<button onclick="showTab('shop')">Shop</button>
+<button onclick="showTab('socials')">Socials</button>
+</nav><div id="loginArea" style="position:absolute; top:10px; right:10px;"></div><!-- HOME --><div id="home">
+<h2 style="text-align:center;">Ride Everything</h2>
+<p style="text-align:center; opacity:0.6;">Content coming soon</p>
+</div><!-- SHOP --><div id="shop" style="display:none;">
+<div>
+<button onclick="shopTab='boards';renderShop()">Boards</button>
+<button onclick="shopTab='hardware';renderShop()">Hardware</button>
+</div>
+<div id="shopContent"></div>
+<button onclick="addToCart()">Add To Cart</button>
+</div><!-- SOCIALS --><div id="socials" style="display:none; text-align:center;">
+<div id="socialList"></div>
+</div><!-- CART --><button onclick="toggleCart()" style="position:fixed;bottom:10px;right:10px;">🛒</button>
 
-"use client"; import { useState, useEffect } from "react";
+<div id="cartPanel"></div><!-- LOGIN --><div id="loginModal">
+<div id="loginBox">
+<input id="email" placeholder="email"><br>
+<input id="username" placeholder="username"><br>
+<button onclick="login()">login</button>
+</div>
+</div><!-- ADMIN --><div id="adminPanel" class="admin" style="display:none;"></div><script>
+let tab='home';
+let shopTab='boards';
+let cart=[];
+let user=null;
+let admin=false;
+let selectedBoard=null;
+let selectedHardware=null;
 
-// BIG upgraded full system export default function App() {
+let site={title:'THROUGH & THROUGH',subtitle:'built for riders',footer:'website made by zappa',socials:{youtube:'user',instagram:'user',facebook:'user',tiktok:'user'}};
 
-// ---------------- STATE ---------------- const [tab, setTab] = useState("home"); const [shopTab, setShopTab] = useState("boards");
+let boards=[{name:'Flame Deck',price:60},{name:'Street Skull',price:55}];
+let hardware=[{name:'Basic',price:20},{name:'Pro',price:35}];
 
-const [cart, setCart] = useState([]); const [cartOpen, setCartOpen] = useState(false);
-
-const [selectedBoard, setSelectedBoard] = useState(null); const [selectedHardware, setSelectedHardware] = useState(null);
-
-const [user, setUser] = useState(null); const [loginOpen, setLoginOpen] = useState(false); const [email, setEmail] = useState(""); const [username, setUsername] = useState("");
-
-const [admin, setAdmin] = useState(false); const [preview, setPreview] = useState(false); const [adminTab, setAdminTab] = useState("site");
-
-// ---------------- SITE SETTINGS ---------------- const [site, setSite] = useState({ title: "THROUGH & THROUGH", subtitle: "built for riders", footer: "website made by zappa | business owned by aiden young", heroText: "ride everything", socials: { youtube: "user", instagram: "user", facebook: "user", tiktok: "user", } });
-
-const [boards, setBoards] = useState([ { name: "Flame Deck", price: 60, desc: "classic street" }, { name: "Street Skull", price: 55, desc: "hardcore" } ]);
-
-const [hardware, setHardware] = useState([ { name: "Basic Hardware", price: 20 }, { name: "Pro Hardware", price: 35 } ]);
-
-// ---------------- LOAD / SAVE ---------------- useEffect(() => { const u = localStorage.getItem("user"); const c = localStorage.getItem("cart"); const s = localStorage.getItem("site"); const b = localStorage.getItem("boards"); const h = localStorage.getItem("hardware");
-
-if (u) {
-  const parsed = JSON.parse(u);
-  setUser(parsed);
-  if (parsed.username === "zappa.admin") setAdmin(true);
+function save(){
+localStorage.setItem('cart',JSON.stringify(cart));
+localStorage.setItem('user',JSON.stringify(user));
+localStorage.setItem('boards',JSON.stringify(boards));
+localStorage.setItem('hardware',JSON.stringify(hardware));
+localStorage.setItem('site',JSON.stringify(site));
 }
 
-if (c) setCart(JSON.parse(c));
-if (s) setSite(JSON.parse(s));
-if (b) setBoards(JSON.parse(b));
-if (h) setHardware(JSON.parse(h));
+function load(){
+cart=JSON.parse(localStorage.getItem('cart')||'[]');
+user=JSON.parse(localStorage.getItem('user')||'null');
+boards=JSON.parse(localStorage.getItem('boards')||JSON.stringify(boards));
+hardware=JSON.parse(localStorage.getItem('hardware')||JSON.stringify(hardware));
+site=JSON.parse(localStorage.getItem('site')||JSON.stringify(site));
+if(user && user.username==='zappa.admin') admin=true;
+}
 
-}, []);
+function showTab(t){
+tab=t;
+document.getElementById('home').style.display=t==='home'?'block':'none';
+document.getElementById('shop').style.display=t==='shop'?'block':'none';
+document.getElementById('socials').style.display=t==='socials'?'block':'none';
+render();
+}
 
-useEffect(() => { localStorage.setItem("cart", JSON.stringify(cart)); localStorage.setItem("site", JSON.stringify(site)); localStorage.setItem("boards", JSON.stringify(boards)); localStorage.setItem("hardware", JSON.stringify(hardware)); }, [cart, site, boards, hardware]);
+function render(){
+document.getElementById('title').innerText=site.title;
+document.getElementById('subtitle').innerText=site.subtitle;
 
-// ---------------- AUTH ---------------- const login = () => { const u = { email, username }; setUser(u); localStorage.setItem("user", JSON.stringify(u));
+let loginArea=document.getElementById('loginArea');
+loginArea.innerHTML=user? user.username+' <button onclick="logout()">logout</button>' : '<button onclick="openLogin()">login</button>';
 
-if (username === "zappa.admin") setAdmin(true);
+renderShop();
+renderCart();
+renderSocials();
+if(admin) renderAdmin();
+}
 
-setLoginOpen(false);
+function renderShop(){
+let el=document.getElementById('shopContent');
+el.innerHTML='';
 
+if(shopTab==='boards'){
+boards.forEach((b,i)=>{
+let d=document.createElement('div');
+d.className='card'+(selectedBoard===i?' selected':'');
+d.innerHTML=b.name+' $'+b.price+' <button onclick="selectBoard('+i+')">select</button>';
+el.appendChild(d);
+});
+}
+
+if(shopTab==='hardware'){
+hardware.forEach((h,i)=>{
+let d=document.createElement('div');
+d.className='card'+(selectedHardware===i?' selected':'');
+d.innerHTML=h.name+' $'+h.price+' <button onclick="selectHardware('+i+')">select</button>';
+el.appendChild(d);
+});
+}
+}
+
+function selectBoard(i){selectedBoard=i;render();}
+function selectHardware(i){selectedHardware=i;render();}
+
+function addToCart(){
+if(selectedBoard===null) return alert('select board');
+let item={
+name:boards[selectedBoard].name+(selectedHardware!==null?' + '+hardware[selectedHardware].name:''),
+price:boards[selectedBoard].price+(selectedHardware!==null?hardware[selectedHardware].price:0)
 };
+cart.push(item);
+save();
+render();
+}
 
-const logout = () => { setUser(null); setAdmin(false); localStorage.removeItem("user"); };
+function renderCart(){
+let el=document.getElementById('cartPanel');
+el.innerHTML='<h3>Cart</h3>';
+let total=0;
+cart.forEach((c,i)=>{
+total+=c.price;
+el.innerHTML+=c.name+' $'+c.price+' <button onclick="removeItem('+i+')">x</button><br>';
+});
+el.innerHTML+='<b>Total: $'+total+'</b><br><button onclick="clearCart()">clear</button>';
+}
 
-// ---------------- CART ---------------- const addToCart = () => { if (!selectedBoard) return alert("select a board first");
+function removeItem(i){cart.splice(i,1);save();render();}
+function clearCart(){cart=[];save();render();}
 
-const item = {
-  name: selectedBoard.name + (selectedHardware ? " + " + selectedHardware.name : ""),
-  price: selectedBoard.price + (selectedHardware?.price || 0)
-};
+function toggleCart(){
+let el=document.getElementById('cartPanel');
+el.style.display=el.style.display==='block'?'none':'block';
+}
 
-setCart([...cart, item]);
+function openLogin(){document.getElementById('loginModal').style.display='flex';}
 
-};
+function login(){
+user={email:document.getElementById('email').value,username:document.getElementById('username').value};
+if(user.username==='zappa.admin') admin=true;
+document.getElementById('loginModal').style.display='none';
+save();render();
+}
 
-const removeItem = (i) => { const copy = [...cart]; copy.splice(i, 1); setCart(copy); };
+function logout(){user=null;admin=false;save();render();}
 
-const clearCart = () => setCart([]);
+function renderSocials(){
+let el=document.getElementById('socialList');
+el.innerHTML='';
+Object.keys(site.socials).forEach(k=>{
+el.innerHTML+=k+': '+site.socials[k]+'<br>';
+});
+}
 
-const total = cart.reduce((sum, item) => sum + item.price, 0);
+function renderAdmin(){
+let el=document.getElementById('adminPanel');
+el.style.display='block';
+el.innerHTML='<h3>Admin</h3>';
 
-// ---------------- UI ---------------- return ( <div className="bg-black text-white min-h-screen p-4">
+el.innerHTML+='Title:<input value="'+site.title+'" onchange="site.title=this.value;save();render()"><br>';
+el.innerHTML+='Subtitle:<input value="'+site.subtitle+'" onchange="site.subtitle=this.value;save();render()"><br>';
 
-{/* HEADER */}
-  <h1 className="text-5xl text-center font-extrabold tracking-widest">{site.title}</h1>
-  <p className="text-center opacity-60 mb-6">{site.subtitle}</p>
+el.innerHTML+='<h4>Boards</h4>';
+boards.forEach((b,i)=>{
+el.innerHTML+=`<input value="${b.name}" onchange="boards[${i}].name=this.value;save();render()">
+<input type='number' value="${b.price}" onchange="boards[${i}].price=+this.value;save();render()">
+<button onclick="boards.splice(${i},1);save();render()">x</button><br>`;
+});
+el.innerHTML+='<button onclick="boards.push({name:\'new\',price:50});save();render()">+ add</button>';
 
-  {/* NAV */}
-  <div className="flex justify-center gap-10 mb-6">
-    <button onClick={() => setTab("home")}>Home</button>
-    <button onClick={() => setTab("shop")}>Shop</button>
-    <button onClick={() => setTab("socials")}>Socials</button>
-  </div>
+el.innerHTML+='<h4>Hardware</h4>';
+hardware.forEach((h,i)=>{
+el.innerHTML+=`<input value="${h.name}" onchange="hardware[${i}].name=this.value;save();render()">
+<input type='number' value="${h.price}" onchange="hardware[${i}].price=+this.value;save();render()">
+<button onclick="hardware.splice(${i},1);save();render()">x</button><br>`;
+});
+el.innerHTML+='<button onclick="hardware.push({name:\'new\',price:25});save();render()">+ add</button>';
+}
 
-  {/* LOGIN */}
-  <div className="absolute top-4 right-4">
-    {user ? (
-      <div>
-        {user.username}
-        <button onClick={logout} className="ml-2 text-red-400">logout</button>
-      </div>
-    ) : (
-      <button onClick={() => setLoginOpen(true)}>login</button>
-    )}
-  </div>
-
-  {/* LOGIN MODAL */}
-  {loginOpen && (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
-      <div className="bg-white text-black p-6 rounded-xl">
-        <input placeholder="email" onChange={(e)=>setEmail(e.target.value)} className="block mb-2 p-2" />
-        <input placeholder="username" onChange={(e)=>setUsername(e.target.value)} className="block mb-2 p-2" />
-        <button onClick={login}>login</button>
-      </div>
-    </div>
-  )}
-
-  {/* ADMIN PANEL FULL */}
-  {admin && (
-    <div className="border p-4 mb-6">
-      <h2 className="font-bold text-xl">ADMIN PANEL</h2>
-
-      <div className="flex gap-4 my-3">
-        <button onClick={()=>setAdminTab("site")}>Site</button>
-        <button onClick={()=>setAdminTab("boards")}>Boards</button>
-        <button onClick={()=>setAdminTab("hardware")}>Hardware</button>
-        <button onClick={()=>setAdminTab("socials")}>Socials</button>
-      </div>
-
-      {adminTab === "site" && (
-        <div>
-          <input value={site.title} onChange={(e)=>setSite({...site,title:e.target.value})} className="text-black" />
-          <input value={site.subtitle} onChange={(e)=>setSite({...site,subtitle:e.target.value})} className="text-black" />
-          <input value={site.footer} onChange={(e)=>setSite({...site,footer:e.target.value})} className="text-black" />
-        </div>
-      )}
-
-      {adminTab === "boards" && boards.map((b,i)=>(
-        <div key={i}>
-          <input value={b.name} onChange={(e)=>{let x=[...boards];x[i].name=e.target.value;setBoards(x)}} className="text-black" />
-          <input type="number" value={b.price} onChange={(e)=>{let x=[...boards];x[i].price=+e.target.value;setBoards(x)}} className="text-black" />
-          <button onClick={()=>setBoards(boards.filter((_,idx)=>idx!==i))}>x</button>
-        </div>
-      ))}
-
-      {adminTab === "hardware" && hardware.map((h,i)=>(
-        <div key={i}>
-          <input value={h.name} onChange={(e)=>{let x=[...hardware];x[i].name=e.target.value;setHardware(x)}} className="text-black" />
-          <input type="number" value={h.price} onChange={(e)=>{let x=[...hardware];x[i].price=+e.target.value;setHardware(x)}} className="text-black" />
-          <button onClick={()=>setHardware(hardware.filter((_,idx)=>idx!==i))}>x</button>
-        </div>
-      ))}
-
-      {adminTab === "socials" && Object.keys(site.socials).map((k)=>(
-        <input key={k} value={site.socials[k]} onChange={(e)=>setSite({...site,socials:{...site.socials,[k]:e.target.value}})} className="text-black block" />
-      ))}
-    </div>
-  )}
-
-  {/* CART */}
-  {cart.length > 0 && (
-    <button onClick={()=>setCartOpen(true)} className="fixed bottom-5 right-5 bg-white text-black w-12 h-12 rounded-full">🛒</button>
-  )}
-
-  {cartOpen && (
-    <div className="fixed right-0 top-0 w-80 h-full bg-white text-black p-4">
-      <button onClick={()=>setCartOpen(false)}>close</button>
-      {cart.map((item,i)=>(
-        <div key={i} className="flex justify-between">
-          {item.name} ${item.price}
-          <button onClick={()=>removeItem(i)}>x</button>
-        </div>
-      ))}
-      <div>Total: ${total}</div>
-      <button onClick={clearCart}>clear</button>
-    </div>
-  )}
-
-  {/* HOME */}
-  {tab === "home" && (
-    <div className="text-center mt-10">
-      <h2 className="text-3xl">{site.heroText}</h2>
-      <p className="opacity-60 mt-2">skate everything. no limits.</p>
-    </div>
-  )}
-
-  {/* SHOP */}
-  {tab === "shop" && (
-    <div>
-      <div className="flex gap-4 mb-4">
-        <button onClick={()=>setShopTab("boards")}>Boards</button>
-        <button onClick={()=>setShopTab("hardware")}>Hardware</button>
-      </div>
-
-      {shopTab === "boards" && boards.map((b,i)=>(
-        <div key={i} className={`border p-3 mb-2 ${selectedBoard===b?"bg-white text-black":""}`}>
-          <div>{b.name}</div>
-          <div>${b.price}</div>
-          <div className="text-xs opacity-60">{b.desc}</div>
-          <button onClick={()=>setSelectedBoard(b)}>select</button>
-        </div>
-      ))}
-
-      {shopTab === "hardware" && hardware.map((h,i)=>(
-        <div key={i} className={`border p-3 mb-2 ${selectedHardware===h?"bg-white text-black":""}`}>
-          {h.name} ${h.price}
-          <button onClick={()=>setSelectedHardware(h)}>select</button>
-        </div>
-      ))}
-
-      <button onClick={addToCart} className="mt-4 bg-white text-black px-4 py-2">add to cart</button>
-    </div>
-  )}
-
-  {/* SOCIALS */}
-  {tab === "socials" && (
-    <div className="text-center">
-      <div>YouTube: {site.socials.youtube}</div>
-      <div>Instagram: {site.socials.instagram}</div>
-      <div>Facebook: {site.socials.facebook}</div>
-      <div>TikTok: {site.socials.tiktok}</div>
-    </div>
-  )}
-
-  <div className="mt-10 text-center text-xs opacity-60">{site.footer}</div>
-
-</div>
-
-); }
+load();
+render();
+</script></body>
+</html>
