@@ -54,25 +54,25 @@
       <button onclick="switchMainTab(1)" id="nav-shop" class="hover:opacity-80">SHOP</button>
       <button onclick="switchMainTab(2)" id="nav-socials" class="hover:opacity-80">SOCIALS</button>
     </div>
-  </nav>  <!-- AUTH AREA -->  <div class="absolute top-4 right-4 z-40 flex gap-2 items-center">
+  </nav>  <!-- TOP RIGHT AUTH -->  <div class="absolute top-4 right-4 z-40 flex gap-2 items-center">
     <button id="auth-btn" onclick="openAuthModal()" class="btn-white">LOGIN</button>
     <button id="admin-open-btn" onclick="openAdminModal()" class="btn-white hidden">ADMIN</button>
     <button id="logout-btn" onclick="logout()" class="btn-white hidden">LOGOUT</button>
   </div>  <!-- HOME -->  <div id="home-section" class="max-w-6xl mx-auto px-6 py-12">
     <h1 id="site-title" class="text-6xl font-bold text-center mb-4">LATEST FROM ZAPPA SKATE</h1>
     <p id="home-info" class="text-center text-xl mb-12 opacity-80">Built for riders • payment soon • stock drops coming</p><div class="mb-16">
-  <h2 class="text-4xl mb-4">Latest YouTube Video</h2>
+  <h2 id="home-video-heading" class="text-4xl mb-4">Latest YouTube Video</h2>
   <div class="aspect-video bg-black rounded-2xl overflow-hidden border border-white soft-shadow">
     <iframe id="youtube-embed" class="w-full h-full" src="https://www.youtube.com/embed/VIDEO_ID_HERE" title="Zappa Skate Latest" frameborder="0" allowfullscreen></iframe>
   </div>
   <p class="text-center mt-4 text-xl opacity-80">Replace VIDEO_ID_HERE with your latest upload • <span id="home-youtube-handle">@user</span></p>
 </div>
 
-<h2 class="text-4xl mb-8 text-center">Latest Posts Across Socials</h2>
+<h2 id="home-posts-heading" class="text-4xl mb-8 text-center">Latest Posts Across Socials</h2>
 <div id="home-post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
   </div>  <!-- SHOP -->  <div id="shop-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
-    <h1 class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-white">
+    <h1 id="shop-title" class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-white">
   <button onclick="switchShopTab(0)" id="sub-boards" class="subtab-active text-3xl pb-2">BOARDS</button>
   <button onclick="switchShopTab(1)" id="sub-hardware" class="text-3xl pb-2">HARDWARE</button>
 </div>
@@ -100,7 +100,7 @@
 <div id="hardware-content" class="hidden"></div>
 
   </div>  <!-- SOCIALS -->  <div id="socials-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
-    <h1 class="text-6xl font-bold text-center mb-12">FOLLOW THE SHRED</h1>
+    <h1 id="socials-title" class="text-6xl font-bold text-center mb-12">FOLLOW THE SHRED</h1>
     <div id="social-links" class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"></div>
   </div>  <!-- CART BUTTON -->  <button id="cart-fab" onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-white text-black rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110 hidden">
     🛒
@@ -174,13 +174,15 @@
           <button onclick="closeAdminModal()" class="btn-white">EXIT</button>
         </div>
       </div><div class="flex gap-3 flex-wrap mb-6">
+    <button onclick="setAdminTab('home')" id="admin-tab-home" class="btn-white">HOME</button>
     <button onclick="setAdminTab('site')" id="admin-tab-site" class="btn-white">SITE</button>
     <button onclick="setAdminTab('boards')" id="admin-tab-boards" class="btn-white">BOARDS</button>
     <button onclick="setAdminTab('hardware')" id="admin-tab-hardware" class="btn-white">HARDWARE</button>
     <button onclick="setAdminTab('socials')" id="admin-tab-socials" class="btn-white">SOCIALS</button>
   </div>
 
-  <div id="admin-site-panel" class="space-y-4"></div>
+  <div id="admin-home-panel" class="hidden space-y-4"></div>
+  <div id="admin-site-panel" class="hidden space-y-4"></div>
   <div id="admin-boards-panel" class="hidden space-y-4"></div>
   <div id="admin-hardware-panel" class="hidden space-y-4"></div>
   <div id="admin-socials-panel" class="hidden space-y-4"></div>
@@ -189,12 +191,12 @@
   </div>  <!-- PREVIEW BADGE -->  <div id="preview-badge" class="hidden fixed bottom-4 left-4 z-[10003] bg-white text-black px-4 py-2 rounded-full border border-black text-lg">PREVIEW MODE</div>  <!-- FOOTER -->  <footer class="bg-black text-white py-8 text-center mt-12 border-t border-white">
     <p id="footer-text" class="text-xl">website made by zappa • business owned by Aiden Young</p>
   </footer>  <script>
-    const STORAGE_KEY = 'zappa_skate_store_v4';
+    const STORAGE_KEY = 'zappa_skate_store_v5';
 
     let currentMainTab = 0;
     let currentShopTab = 0;
     let currentAuthMode = 'login';
-    let currentAdminTab = 'site';
+    let currentAdminTab = 'home';
     let previewMode = false;
 
     let selectedBoard = null;
@@ -212,6 +214,9 @@
       footer: 'website made by zappa • business owned by Aiden Young',
       youtubeHandle: '@user',
       youtubeVideoId: 'VIDEO_ID_HERE',
+      homeVideoHeading: 'Latest YouTube Video',
+      homePostsHeading: 'Latest Posts Across Socials',
+      socialsTitle: 'FOLLOW THE SHRED',
       socials: {
         youtube: 'user',
         instagram: 'user',
@@ -304,13 +309,14 @@
     function renderHome() {
       document.getElementById('site-title').textContent = site.title;
       document.getElementById('home-info').textContent = site.homeInfo;
+      document.getElementById('home-video-heading').textContent = site.homeVideoHeading;
+      document.getElementById('home-posts-heading').textContent = site.homePostsHeading;
       document.getElementById('footer-text').textContent = site.footer;
       document.getElementById('youtube-embed').src = `https://www.youtube.com/embed/${site.youtubeVideoId}`;
       document.getElementById('home-youtube-handle').textContent = site.youtubeHandle;
 
       const grid = document.getElementById('home-post-grid');
       grid.innerHTML = '';
-
       site.homePosts.forEach((post) => {
         const card = document.createElement('div');
         card.className = 'border border-white rounded-3xl overflow-hidden soft-shadow bg-black';
@@ -326,6 +332,7 @@
     }
 
     function renderSocials() {
+      document.getElementById('socials-title').textContent = site.socialsTitle;
       const socialLinks = document.getElementById('social-links');
       socialLinks.innerHTML = `
         <a href="https://youtube.com/@${encodeURIComponent(site.socials.youtube.replace('@', ''))}" target="_blank" class="border-2 border-white rounded-3xl py-12 hover:bg-white hover:text-black text-4xl flex flex-col items-center">📺<br><span class="mt-4">YouTube • ${escapeHtml(site.socials.youtube)}</span></a>
@@ -586,9 +593,10 @@
 
     function setAdminTab(tabName) {
       currentAdminTab = tabName;
-      ['site', 'boards', 'hardware', 'socials'].forEach((tab) => {
+      ['home', 'site', 'boards', 'hardware', 'socials'].forEach((tab) => {
         document.getElementById(`admin-${tab}-panel`).classList.toggle('hidden', tab !== tabName);
         const btn = document.getElementById(`admin-tab-${tab}`);
+        if (!btn) return;
         btn.classList.toggle('bg-white', tab === tabName);
         btn.classList.toggle('text-black', tab === tabName);
         btn.classList.toggle('bg-black', tab !== tabName);
@@ -627,7 +635,7 @@
         } else {
           alert('Home posts must be a JSON array');
         }
-      } catch (err) {
+      } catch {
         alert('Invalid JSON in home posts');
       }
     }
@@ -692,32 +700,33 @@
     function removeHardware(index) {
       const removed = hardwareList[index];
       hardwareList.splice(index, 1);
-      if (removed) {
-        selectedHardware = selectedHardware.filter((h) => h.id !== removed.id);
-      }
+      if (removed) selectedHardware = selectedHardware.filter((h) => h.id !== removed.id);
       saveState();
       renderAll();
       renderAdmin();
     }
 
     function renderAdmin() {
-      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
       setAdminTab(currentAdminTab);
 
-      const sitePanel = document.getElementById('admin-site-panel');
-      sitePanel.innerHTML = `
+      const homePanel = document.getElementById('admin-home-panel');
+      homePanel.innerHTML = `
         <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="field-label">Site Title</label>
+            <label class="field-label">Home Title</label>
             <input class="panel-input" value="${escapeHtml(site.title)}" onchange="updateSiteField('title', this.value)" />
-          </div>
-          <div>
-            <label class="field-label">Footer Text</label>
-            <input class="panel-input" value="${escapeHtml(site.footer)}" onchange="updateSiteField('footer', this.value)" />
           </div>
           <div>
             <label class="field-label">Home Info Line</label>
             <input class="panel-input" value="${escapeHtml(site.homeInfo)}" onchange="updateSiteField('homeInfo', this.value)" />
+          </div>
+          <div>
+            <label class="field-label">Home Video Heading</label>
+            <input class="panel-input" value="${escapeHtml(site.homeVideoHeading)}" onchange="updateSiteField('homeVideoHeading', this.value)" />
+          </div>
+          <div>
+            <label class="field-label">Home Posts Heading</label>
+            <input class="panel-input" value="${escapeHtml(site.homePostsHeading)}" onchange="updateSiteField('homePostsHeading', this.value)" />
           </div>
           <div>
             <label class="field-label">YouTube Handle</label>
@@ -736,6 +745,20 @@
     </div>
   `;
   document.getElementById('admin-home-posts').value = JSON.stringify(site.homePosts, null, 2);
+
+  const sitePanel = document.getElementById('admin-site-panel');
+  sitePanel.innerHTML = `
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="field-label">Footer Text</label>
+        <input class="panel-input" value="${escapeHtml(site.footer)}" onchange="updateSiteField('footer', this.value)" />
+      </div>
+      <div>
+        <label class="field-label">Brand / Headline</label>
+        <input class="panel-input" value="${escapeHtml(site.title)}" onchange="updateSiteField('title', this.value)" />
+      </div>
+    </div>
+  `;
 
   const boardsPanel = document.getElementById('admin-boards-panel');
   boardsPanel.innerHTML = boards.map((b, i) => `
@@ -802,12 +825,15 @@
   const socialsPanel = document.getElementById('admin-socials-panel');
   socialsPanel.innerHTML = `
     <div class="grid md:grid-cols-2 gap-4">
+      <div><label class="field-label">Socials Page Title</label><input class="panel-input" value="${escapeHtml(site.socialsTitle)}" onchange="updateSiteField('socialsTitle', this.value)" /></div>
       <div><label class="field-label">YouTube</label><input class="panel-input" value="${escapeHtml(site.socials.youtube)}" onchange="updateSocialField('youtube', this.value)" /></div>
       <div><label class="field-label">Instagram</label><input class="panel-input" value="${escapeHtml(site.socials.instagram)}" onchange="updateSocialField('instagram', this.value)" /></div>
       <div><label class="field-label">Facebook</label><input class="panel-input" value="${escapeHtml(site.socials.facebook)}" onchange="updateSocialField('facebook', this.value)" /></div>
       <div><label class="field-label">TikTok</label><input class="panel-input" value="${escapeHtml(site.socials.tiktok)}" onchange="updateSocialField('tiktok', this.value)" /></div>
     </div>
   `;
+
+  document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
 }
 
 function getCurrentSetupTotal() {
@@ -869,7 +895,6 @@ function openProductModal(type, index) {
   cartBtn.disabled = soldOut;
   setupBtn.textContent = type === 'board' ? 'USE FOR SETUP' : 'ADD TO SETUP';
   cartBtn.textContent = type === 'board' ? 'ADD BOARD TO CART' : 'ADD HARDWARE TO CART';
-
   setupBtn.style.opacity = soldOut ? '0.45' : '1';
   cartBtn.style.opacity = soldOut ? '0.45' : '1';
 
@@ -910,17 +935,15 @@ function modalAddToCart() {
     alert('Sold out');
     return;
   }
-
   const cartItem = {
     type: selectedModalItem.type,
     title: item.name,
-    boardName: selectedModalItem.type === 'board' ? item.name : item.name,
+    boardName: item.name,
     hardwareNames: [],
     totalPrice: Number(item.price || 0),
     image: item.img,
     components: [{ id: item.id, type: selectedModalItem.type, name: item.name }]
   };
-
   cart.push(cartItem);
   decrementStock(item);
   saveState();
@@ -957,7 +980,6 @@ function addSetupToCart() {
 
   decrementStock(selectedBoard);
   selectedHardware.forEach((item) => decrementStock(item));
-
   selectedBoard = null;
   selectedHardware = [];
   saveState();
@@ -1003,29 +1025,6 @@ function hideCart() {
   modal.classList.remove('flex');
 }
 
-function saveAdmin() {
-  saveState();
-  renderAll();
-  renderAdmin();
-  alert('Saved');
-}
-
-function setSiteField(field, value) {
-  site[field] = value;
-  saveState();
-  renderAll();
-  renderAdmin();
-}
-
-function openLoginFromTopRight() {
-  openAuthModal();
-}
-
-function renderAuthButtonBehavior() {
-  const authBtn = document.getElementById('auth-btn');
-  authBtn.onclick = user ? (() => {}) : openAuthModal;
-}
-
 window.switchMainTab = switchMainTab;
 window.switchShopTab = switchShopTab;
 window.openAuthModal = openAuthModal;
@@ -1055,21 +1054,6 @@ window.removeFromCart = removeFromCart;
 window.proceedCheckout = proceedCheckout;
 window.toggleCart = toggleCart;
 window.hideCart = hideCart;
-window.saveAdmin = saveAdmin;
-
-function boot() {
-  loadState();
-  renderAll();
-  setAuthMode('login');
-  switchMainTab(0);
-  switchShopTab(0);
-  renderAuthButtonBehavior();
-  if (isAdmin) {
-    document.getElementById('admin-open-btn').classList.remove('hidden');
-    document.getElementById('logout-btn').classList.remove('hidden');
-    document.getElementById('auth-btn').classList.add('hidden');
-  }
-}
 
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
@@ -1079,7 +1063,18 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-window.onload = boot;
+window.onload = () => {
+  loadState();
+  renderAll();
+  setAuthMode('login');
+  switchMainTab(0);
+  switchShopTab(0);
+  if (isAdmin) {
+    document.getElementById('admin-open-btn').classList.remove('hidden');
+    document.getElementById('logout-btn').classList.remove('hidden');
+    document.getElementById('auth-btn').classList.add('hidden');
+  }
+};
 
   </script>
 </body>
