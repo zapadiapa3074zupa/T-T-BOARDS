@@ -1,219 +1,115 @@
-"use client"; import { useEffect, useState } from "react";
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skate Shop</title>
+<style>
+body { margin:0; font-family:Arial; background:white; }.nav { display:flex; justify-content:center; gap:40px; padding:20px; } .nav button { background:none; border:none; font-size:18px; font-weight:bold; cursor:pointer; }
 
-// ===================================================== // THROUGH & THROUGH — ORIGINAL STRUCTURE (RESTORED) // + SellAuth-style product modal + auth + admin system // =====================================================
+.section { display:none; padding:20px; } .active { display:block; }
 
-export default function Home() {
+.shop-tabs { margin-top:40px; margin-left:20%; }
 
-// ---------------- NAV (ORIGINAL) ---------------- const [tab, setTab] = useState("home"); const [shopTab, setShopTab] = useState("boards");
+.product { border:1px solid #ccc; padding:15px; margin:10px; display:inline-block; cursor:pointer; }
 
-// ---------------- CART (ORIGINAL) ---------------- const [cart, setCart] = useState([]); const [showCart, setShowCart] = useState(false);
+.cart-btn { position:fixed; bottom:20px; right:20px; width:55px; height:55px; border-radius:50%; background:black; color:white; display:none; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; }
 
-// ---------------- PRODUCT SELECTION ---------------- const [selectedBoard, setSelectedBoard] = useState(null); const [selectedHardware, setSelectedHardware] = useState(null);
+.footer { margin-top:60px; text-align:center; font-size:16px; } </style>
 
-// ---------------- AUTH (EXPANDED BUT CLEAN) ---------------- const [user, setUser] = useState(null); const [authOpen, setAuthOpen] = useState(false); const [mode, setMode] = useState("login"); // login | signup
+</head>
+<body><div class="nav">
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('shop')">Shop</button>
+  <button onclick="showSection('socials')">Socials</button>
+</div><div id="home" class="section active">
+  <h2>Latest Content</h2>
+  <p>YouTube</p>
+  <iframe width="300" height="200" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+  <p>Instagram | Facebook | TikTok feeds coming here</p>
+</div><div id="shop" class="section">
+  <div class="shop-tabs">
+    <button onclick="showShopTab('boards')">Boards</button>
+    <button onclick="showShopTab('hardware')">Hardware</button>
+  </div>  <div id="boards" class="shop-content">
+    <div class="product" onclick="selectBoard('Classic Deck', 50)">Classic Deck - $50</div>
+    <div class="product" onclick="selectBoard('Pro Deck', 80)">Pro Deck - $80</div>
+  </div>  <div id="hardware" class="shop-content" style="display:none;">
+    <div class="product" onclick="addHardware('Trucks', 30)">Trucks - $30</div>
+    <div class="product" onclick="addHardware('Wheels', 25)">Wheels - $25</div>
+  </div>  <div id="actions" style="margin-top:20px; display:none;">
+    <button onclick="addToCart()">Add to Cart</button>
+    <button onclick="checkout()">Proceed to Checkout</button>
+  </div>
+</div><div id="socials" class="section">
+  <h2>Social Links</h2>
+  <p><a href="#">User YouTube</a></p>
+  <p><a href="#">User Instagram</a></p>
+  <p><a href="#">User Facebook</a></p>
+  <p><a href="#">User TikTok</a></p>
+</div><div class="cart-btn" id="cartBtn" onclick="openCart()">🛒</div><div class="footer">
+  Website made by zappa<br>
+  Business owned by Aiden Young
+</div><script>
+let cart = [];
+let selectedBoard = null;
+let selectedHardware = [];
 
-const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [username, setUsername] = useState("");
-
-const [isAdmin, setIsAdmin] = useState(false);
-
-// ---------------- ADMIN ---------------- const [adminTab, setAdminTab] = useState("site");
-
-// ---------------- SITE DATA (ORIGINAL STYLE) ---------------- const [site, setSite] = useState({ title: "THROUGH & THROUGH", footer: "website made by zappa business owned by Aiden Young", socials: { youtube: "user", instagram: "user", facebook: "user", tiktok: "user", }, });
-
-// ---------------- PRODUCTS ---------------- const [boards, setBoards] = useState([ { name: "Flame Deck", price: 60, img: "https://via.placeholder.com/200" }, { name: "Skull Deck", price: 55, img: "https://via.placeholder.com/200" }, ]);
-
-const [hardware, setHardware] = useState([ { name: "Basic Hardware", price: 20, img: "https://via.placeholder.com/200" }, { name: "Pro Hardware", price: 35, img: "https://via.placeholder.com/200" }, ]);
-
-// ---------------- MODAL ---------------- const [modalItem, setModalItem] = useState(null);
-
-// ---------------- LOAD SAVE ---------------- useEffect(() => { const data = JSON.parse(localStorage.getItem("tt_store") || "{}"); if (data.cart) setCart(data.cart); if (data.user) { setUser(data.user); if (data.user.username === "zappa.admin") setIsAdmin(true); } if (data.boards) setBoards(data.boards); if (data.hardware) setHardware(data.hardware); if (data.site) setSite(data.site); }, []);
-
-useEffect(() => { localStorage.setItem( "tt_store", JSON.stringify({ cart, user, boards, hardware, site }) ); }, [cart, user, boards, hardware, site]);
-
-// ---------------- AUTH ---------------- const handleAuth = () => { const u = { email, password, username };
-
-if (mode === "signup") {
-  setUser(u);
-} else {
-  setUser(u);
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-if (username === "zappa.admin") setIsAdmin(true);
+function showShopTab(tab) {
+  document.getElementById('boards').style.display = tab==='boards'?'block':'none';
+  document.getElementById('hardware').style.display = tab==='hardware'?'block':'none';
+}
 
-setAuthOpen(false);
+function selectBoard(name, price) {
+  selectedBoard = {name, price};
+  document.getElementById('actions').style.display = 'block';
+}
 
-};
+function addHardware(name, price) {
+  selectedHardware.push({name, price});
+  document.getElementById('actions').style.display = 'block';
+}
 
-// ---------------- CART ---------------- const addToCart = (item) => { setCart([...cart, item]); };
+function addToCart() {
+  if (!selectedBoard) return alert('Select a board first');
 
-const total = cart.reduce((a, b) => a + b.price, 0);
+  let total = selectedBoard.price;
+  selectedHardware.forEach(h => total += h.price);
 
-// ---------------- UI ---------------- return ( <div className="min-h-screen bg-black text-white p-4">
+  cart.push({
+    board: selectedBoard,
+    hardware: [...selectedHardware],
+    total
+  });
 
-{/* TITLE (ORIGINAL POSITION) */}
-  <h1 className="text-5xl text-center font-bold tracking-widest">
-    {site.title}
-  </h1>
+  document.getElementById('cartBtn').style.display = 'flex';
+  alert('Added to cart');
 
-  {/* NAV (ORIGINAL) */}
-  <div className="flex justify-center gap-10 mt-4">
-    <button onClick={() => setTab("home")}>Home</button>
-    <button onClick={() => setTab("shop")}>Shop</button>
-    <button onClick={() => setTab("socials")}>Socials</button>
-  </div>
+  selectedBoard = null;
+  selectedHardware = [];
+}
 
-  {/* LOGIN BUTTON */}
-  <div className="absolute top-4 right-4">
-    {!user ? (
-      <button onClick={() => setAuthOpen(true)}>Login</button>
-    ) : (
-      <div>
-        {user.username}
-        <button onClick={() => setUser(null)}>Logout</button>
-      </div>
-    )}
-  </div>
+function checkout() {
+  alert('Checkout not available yet');
+}
 
-  {/* AUTH MODAL */}
-  {authOpen && (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
-      <div className="bg-white text-black p-4 w-72">
+function openCart() {
+  if (cart.length === 0) return alert('Cart empty');
 
-        <div className="flex gap-2 mb-2">
-          <button onClick={() => setMode("login")}>Login</button>
-          <button onClick={() => setMode("signup")}>Sign Up</button>
-        </div>
+  let total = 0;
+  let msg = '';
 
-        <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
-        <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
+  cart.forEach((item, i) => {
+    msg += `Item ${i+1}: ${item.board.name} + ${item.hardware.map(h=>h.name).join(', ')} = $${item.total}\n`;
+    total += item.total;
+  });
 
-        {mode === "signup" && (
-          <input placeholder="username" onChange={(e) => setUsername(e.target.value)} />
-        )}
-
-        <button onClick={handleAuth}>{mode}</button>
-      </div>
-    </div>
-  )}
-
-  {/* HOME */}
-  {tab === "home" && (
-    <div className="text-center mt-10 opacity-70">
-      Latest videos, drops, and skate content coming soon
-    </div>
-  )}
-
-  {/* SHOP */}
-  {tab === "shop" && (
-    <div className="mt-6">
-
-      <div className="flex gap-4 mb-4 justify-center">
-        <button onClick={() => setShopTab("boards")}>Boards</button>
-        <button onClick={() => setShopTab("hardware")}>Hardware</button>
-      </div>
-
-      {/* BOARDS */}
-      {shopTab === "boards" && boards.map((b, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 border p-2 mb-2 cursor-pointer"
-          onClick={() => setModalItem(b)}
-        >
-          <img src={b.img} className="w-16 h-16" />
-          <div>
-            <div>{b.name}</div>
-            <div>${b.price}</div>
-          </div>
-        </div>
-      ))}
-
-      {/* HARDWARE */}
-      {shopTab === "hardware" && hardware.map((h, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 border p-2 mb-2 cursor-pointer"
-          onClick={() => setModalItem(h)}
-        >
-          <img src={h.img} className="w-16 h-16" />
-          <div>
-            <div>{h.name}</div>
-            <div>${h.price}</div>
-          </div>
-        </div>
-      ))}
-
-    </div>
-  )}
-
-  {/* SOCIALS */}
-  {tab === "socials" && (
-    <div className="text-center mt-10">
-      <p>YouTube: {site.socials.youtube}</p>
-      <p>Instagram: {site.socials.instagram}</p>
-      <p>Facebook: {site.socials.facebook}</p>
-      <p>TikTok: {site.socials.tiktok}</p>
-    </div>
-  )}
-
-  {/* MODAL (SELL AUTH STYLE) */}
-  {modalItem && (
-    <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center"
-      onClick={() => setModalItem(null)}
-    >
-      <div className="bg-white text-black p-4 w-72" onClick={(e) => e.stopPropagation()}>
-        <img src={modalItem.img} className="w-full" />
-        <h2>{modalItem.name}</h2>
-        <p>${modalItem.price}</p>
-
-        <button onClick={() => addToCart(modalItem)}>Add to Cart</button>
-        <button onClick={() => alert("Payment soon - not released yet")}>Pay Now</button>
-      </div>
-    </div>
-  )}
-
-  {/* CART */}
-  <div className="fixed bottom-4 right-4">
-    <button onClick={() => setShowCart(!showCart)}>🛒</button>
-  </div>
-
-  {showCart && (
-    <div className="fixed right-0 top-0 w-64 h-full bg-white text-black p-2">
-      <h3>Cart</h3>
-      {cart.map((c, i) => (
-        <div key={i}>{c.name} ${c.price}</div>
-      ))}
-      <hr />
-      <b>Total: ${total}</b>
-      <button onClick={() => alert("Payment soon")}>Pay Now</button>
-    </div>
-  )}
-
-  {/* ADMIN */}
-  {isAdmin && (
-    <div className="border mt-6 p-2">
-      <h3>Admin Panel</h3>
-
-      <p>Boards</p>
-      {boards.map((b, i) => (
-        <div key={i}>
-          <input value={b.name} onChange={(e) => {
-            const x = [...boards]; x[i].name = e.target.value; setBoards(x);
-          }} />
-          <input value={b.price} onChange={(e) => {
-            const x = [...boards]; x[i].price = +e.target.value; setBoards(x);
-          }} />
-        </div>
-      ))}
-
-    </div>
-  )}
-
-  {/* FOOTER */}
-  <div className="text-center mt-10 opacity-60">
-    {site.footer}
-  </div>
-
-</div>
-
-); }
+  msg += `\nTotal: $${total}`;
+  alert(msg);
+}
+</script></body>
+</html>
