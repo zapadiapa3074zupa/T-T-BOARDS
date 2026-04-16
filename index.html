@@ -7,60 +7,62 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
     body { font-family: 'Anton', sans-serif; }
-    .tab-active { border-bottom: 4px solid #000; }
-    .subtab-active { border-bottom: 3px solid #000; }
-    .cart-circle {
-      width: 52px; height: 52px;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
+    .tab-active { border-bottom: 4px solid #fff; }
+    .subtab-active { border-bottom: 3px solid #fff; }
+    .cart-circle { width: 52px; height: 52px; transition: transform 0.2s ease, opacity 0.2s ease; }
     .cart-circle:hover { transform: scale(1.08); }
-    @media (max-width: 768px) {
-      .cart-circle { width: 42px; height: 42px; }
-    }
-    .product-row {
-      transition: transform 0.18s ease, background-color 0.18s ease;
-    }
+    @media (max-width: 768px) { .cart-circle { width: 42px; height: 42px; } }
+    .product-row { transition: transform 0.18s ease, background-color 0.18s ease; }
     .product-row:hover { transform: translateY(-1px); }
     .modal-backdrop { backdrop-filter: blur(6px); }
-    .soft-shadow { box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-    input, textarea, select {
-      border: 1px solid #000;
-      padding: 0.55rem 0.7rem;
+    .soft-shadow { box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+    .btn-white {
+      background: #fff;
+      color: #000;
+      border: 1px solid #fff;
+      border-radius: 1rem;
+      padding: 0.85rem 1.1rem;
+      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+    }
+    .btn-white:hover { transform: scale(1.03); opacity: 0.92; }
+    .btn-dark {
+      background: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .btn-dark:hover { transform: scale(1.03); opacity: 0.92; }
+    .panel-input, .panel-textarea {
       width: 100%;
       background: #fff;
       color: #000;
-      font-family: inherit;
-    }
-    .mini-btn {
       border: 1px solid #000;
-      padding: 0.35rem 0.6rem;
-      border-radius: 0.4rem;
-      font-size: 0.95rem;
-      line-height: 1;
+      border-radius: 0.9rem;
+      padding: 0.75rem 0.9rem;
+      font-family: inherit;
+      outline: none;
     }
-    .mini-btn-dark {
-      border: 1px solid #fff;
-      padding: 0.35rem 0.6rem;
-      border-radius: 0.4rem;
-      font-size: 0.95rem;
-      line-height: 1;
-      background: #000;
-      color: #fff;
-    }
+    .panel-textarea { min-height: 160px; resize: vertical; }
+    .field-label { font-size: 1.1rem; margin-bottom: 0.35rem; display: block; }
   </style>
 </head>
-<body class="bg-white text-black">  <!-- NAVBAR -->  <nav class="border-b border-black sticky top-0 bg-white z-50">
+<body class="bg-black text-white">  <!-- NAVBAR -->  <nav class="border-b border-white sticky top-0 bg-black z-50">
     <div class="max-w-6xl mx-auto px-6 py-5 flex justify-center items-center gap-12 text-2xl">
-      <button onclick="switchTab(0)" id="nav-home" class="tab-active hover:text-gray-600">HOME</button>
-      <button onclick="switchTab(1)" id="nav-shop" class="hover:text-gray-600">SHOP</button>
-      <button onclick="switchTab(2)" id="nav-socials" class="hover:text-gray-600">SOCIALS</button>
+      <button onclick="switchMainTab(0)" id="nav-home" class="tab-active hover:opacity-80">HOME</button>
+      <button onclick="switchMainTab(1)" id="nav-shop" class="hover:opacity-80">SHOP</button>
+      <button onclick="switchMainTab(2)" id="nav-socials" class="hover:opacity-80">SOCIALS</button>
     </div>
-  </nav>  <!-- AUTH BUTTON -->  <div class="absolute top-4 right-4 z-40">
-    <button id="auth-btn" onclick="openAuthModal()" class="mini-btn bg-white hover:bg-gray-100">LOGIN</button>
+  </nav>  <!-- AUTH AREA -->  <div class="absolute top-4 right-4 z-40 flex gap-2 items-center">
+    <button id="auth-btn" onclick="openAuthModal()" class="btn-white">LOGIN</button>
+    <button id="admin-open-btn" onclick="openAdminModal()" class="btn-white hidden">ADMIN</button>
+    <button id="logout-btn" onclick="logout()" class="btn-white hidden">LOGOUT</button>
   </div>  <!-- HOME -->  <div id="home-section" class="max-w-6xl mx-auto px-6 py-12">
-    <h1 id="site-title" class="text-6xl font-bold text-center mb-12">LATEST FROM ZAPPA SKATE</h1><div class="mb-16">
+    <h1 id="site-title" class="text-6xl font-bold text-center mb-4">LATEST FROM ZAPPA SKATE</h1>
+    <p id="home-info" class="text-center text-xl mb-12 opacity-80">Built for riders • payment soon • stock drops coming</p><div class="mb-16">
   <h2 class="text-4xl mb-4">Latest YouTube Video</h2>
-  <div class="aspect-video bg-black rounded-2xl overflow-hidden soft-shadow">
+  <div class="aspect-video bg-black rounded-2xl overflow-hidden border border-white soft-shadow">
     <iframe id="youtube-embed" class="w-full h-full" src="https://www.youtube.com/embed/VIDEO_ID_HERE" title="Zappa Skate Latest" frameborder="0" allowfullscreen></iframe>
   </div>
   <p class="text-center mt-4 text-xl opacity-80">Replace VIDEO_ID_HERE with your latest upload • <span id="home-youtube-handle">@user</span></p>
@@ -70,12 +72,12 @@
 <div id="home-post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
   </div>  <!-- SHOP -->  <div id="shop-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
-    <h1 class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-black">
+    <h1 class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-white">
   <button onclick="switchShopTab(0)" id="sub-boards" class="subtab-active text-3xl pb-2">BOARDS</button>
   <button onclick="switchShopTab(1)" id="sub-hardware" class="text-3xl pb-2">HARDWARE</button>
 </div>
 
-<div id="setup-summary" class="bg-black text-white p-6 rounded-3xl mb-8 flex flex-wrap items-center justify-between gap-6 soft-shadow">
+<div id="setup-summary" class="bg-white text-black p-6 rounded-3xl mb-8 flex flex-wrap items-center justify-between gap-6 soft-shadow">
   <div class="min-w-[240px]">
     <span class="text-xl">SELECTED BOARD:</span>
     <span id="selected-board-name" class="ml-4 font-bold text-2xl">— None yet —</span>
@@ -89,94 +91,93 @@
     <span id="setup-total" class="ml-4 font-bold text-4xl">$0.00</span>
   </div>
   <div class="flex gap-4 flex-wrap">
-    <button onclick="addToCartFromSelection()" class="bg-white text-black px-8 py-4 rounded-2xl font-bold text-xl hover:scale-105 transition-transform">ADD TO CART</button>
-    <button onclick="proceedCheckout()" class="bg-white text-black px-8 py-4 rounded-2xl font-bold text-xl hover:scale-105 transition-transform">PROCEED TO CHECKOUT</button>
+    <button onclick="addSetupToCart()" class="btn-dark text-2xl px-6 py-4">ADD TO CART</button>
+    <button onclick="proceedCheckout()" class="btn-dark text-2xl px-6 py-4">PROCEED TO CHECKOUT</button>
   </div>
 </div>
 
-<!-- BOARDS -->
 <div id="boards-content"></div>
-
-<!-- HARDWARE -->
 <div id="hardware-content" class="hidden"></div>
 
   </div>  <!-- SOCIALS -->  <div id="socials-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
     <h1 class="text-6xl font-bold text-center mb-12">FOLLOW THE SHRED</h1>
     <div id="social-links" class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"></div>
-  </div>  <!-- FLOATING CART -->  <button onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-black text-white rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110">
+  </div>  <!-- CART BUTTON -->  <button id="cart-fab" onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-white text-black rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110 hidden">
     🛒
     <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
   </button>  <!-- CART MODAL -->  <div id="cart-modal" class="hidden fixed inset-0 bg-black/70 modal-backdrop items-end md:items-center justify-center z-[9999]">
-    <div class="bg-white w-full max-w-2xl rounded-t-3xl md:rounded-3xl p-8 soft-shadow max-h-[92vh] overflow-auto">
-      <div class="flex justify-between items-center mb-8">
+    <div class="bg-black text-white border border-white w-full max-w-2xl rounded-t-3xl md:rounded-3xl p-8 soft-shadow max-h-[92vh] overflow-auto">
+      <div class="flex justify-between items-center mb-8 gap-4">
         <h2 class="text-5xl font-bold">YOUR CART</h2>
-        <button onclick="hideCart()" class="text-4xl">✕</button>
+        <button onclick="hideCart()" class="text-4xl leading-none">✕</button>
       </div>
       <div id="cart-items" class="space-y-6"></div>
-      <div class="border-t border-black mt-8 pt-8 flex justify-between text-3xl flex-wrap gap-4">
+      <div class="border-t border-white mt-8 pt-8 flex justify-between text-3xl flex-wrap gap-4">
         <span>TOTAL (no shipping)</span>
         <span id="cart-total" class="font-bold">$0.00</span>
       </div>
       <div class="flex gap-4 mt-8 flex-wrap">
-        <button onclick="hideCart()" class="flex-1 border-2 border-black py-6 text-2xl rounded-3xl">KEEP SHOPPING</button>
-        <button onclick="proceedCheckout()" class="flex-1 bg-black text-white py-6 text-2xl rounded-3xl">CHECKOUT</button>
+        <button onclick="hideCart()" class="flex-1 btn-white py-6 text-2xl">KEEP SHOPPING</button>
+        <button onclick="proceedCheckout()" class="flex-1 btn-white py-6 text-2xl">CHECKOUT</button>
       </div>
     </div>
-  </div>  <!-- PRODUCT MODAL -->  <div id="product-modal" class="hidden fixed inset-0 bg-black/70 modal-backdrop items-center justify-center z-[10000] p-4">
-    <div class="bg-white text-black w-full max-w-xl rounded-3xl p-6 soft-shadow max-h-[92vh] overflow-auto">
+  </div>  <!-- PRODUCT MODAL -->  <div id="product-modal" class="hidden fixed inset-0 bg-black/75 modal-backdrop items-center justify-center z-[10000] p-4">
+    <div class="bg-black text-white border border-white w-full max-w-xl rounded-3xl p-6 soft-shadow max-h-[92vh] overflow-auto">
       <div class="flex justify-between items-start gap-4">
         <div>
           <h3 id="modal-title" class="text-4xl leading-tight">Product</h3>
           <p id="modal-price" class="text-3xl mt-2">$0.00</p>
+          <p id="modal-stock" class="text-sm mt-2 opacity-70">Stock: 0</p>
         </div>
         <button onclick="closeProductModal()" class="text-4xl leading-none">✕</button>
       </div>
       <div class="mt-5 flex gap-4 items-start flex-col md:flex-row">
-        <img id="modal-image" src="https://picsum.photos/600/600" alt="Product" class="w-full md:w-44 aspect-square object-cover rounded-2xl border border-black" />
+        <img id="modal-image" src="https://picsum.photos/600/600" alt="Product" class="w-full md:w-44 aspect-square object-cover rounded-2xl border border-white flex-none" />
         <div class="flex-1">
           <p id="modal-desc" class="text-xl mb-6">Description</p>
           <div class="flex gap-3 flex-wrap">
-            <button onclick="modalAddToCart()" class="bg-black text-white px-6 py-3 rounded-2xl text-xl">ADD TO CART</button>
-            <button onclick="proceedCheckout()" class="border border-black px-6 py-3 rounded-2xl text-xl">PAY NOW</button>
+            <button id="modal-setup-btn" onclick="modalUseForSetup()" class="btn-white text-xl">USE FOR SETUP</button>
+            <button id="modal-cart-btn" onclick="modalAddToCart()" class="btn-white text-xl">ADD TO CART</button>
+            <button onclick="proceedCheckout()" class="btn-white text-xl">PAY NOW</button>
           </div>
         </div>
       </div>
     </div>
-  </div>  <!-- AUTH MODAL -->  <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 modal-backdrop flex items-center justify-center z-[10001] p-4">
-    <div class="bg-white text-black p-6 w-full max-w-md rounded-3xl soft-shadow">
-      <div class="flex justify-between items-center mb-4">
+  </div>  <!-- AUTH MODAL -->  <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 modal-backdrop items-center justify-center z-[10001] p-4">
+    <div class="bg-black text-white border border-white p-6 w-full max-w-md rounded-3xl soft-shadow">
+      <div class="flex justify-between items-center mb-4 gap-4">
         <h2 id="auth-title" class="text-3xl">LOGIN</h2>
         <button onclick="closeAuthModal()" class="text-3xl leading-none">✕</button>
       </div>
-      <div class="flex gap-3 mb-4">
-        <button id="login-tab-btn" onclick="setAuthMode('login')" class="mini-btn bg-black text-white">LOGIN</button>
-        <button id="signup-tab-btn" onclick="setAuthMode('signup')" class="mini-btn">SIGN UP</button>
+      <div class="flex gap-3 mb-4 flex-wrap">
+        <button id="login-tab-btn" onclick="setAuthMode('login')" class="btn-white">LOGIN</button>
+        <button id="signup-tab-btn" onclick="setAuthMode('signup')" class="btn-white">SIGN UP</button>
       </div>
-      <label class="block text-lg mb-1">Email</label>
-      <input id="auth-email" type="email" placeholder="email@example.com" class="mb-3" />
-      <label class="block text-lg mb-1">Password</label>
-      <input id="auth-password" type="password" placeholder="password" class="mb-3" />
+      <label class="field-label">Email</label>
+      <input id="auth-email" type="email" placeholder="email@example.com" class="mb-3 panel-input" />
+      <label class="field-label">Password</label>
+      <input id="auth-password" type="password" placeholder="password" class="mb-3 panel-input" />
       <div id="username-wrap" class="hidden">
-        <label class="block text-lg mb-1">Username</label>
-        <input id="auth-username" type="text" placeholder="username" class="mb-3" />
+        <label class="field-label">Username</label>
+        <input id="auth-username" type="text" placeholder="username" class="mb-3 panel-input" />
       </div>
-      <button onclick="submitAuth()" class="bg-black text-white w-full py-3 rounded-2xl text-2xl">ENTER</button>
+      <button onclick="submitAuth()" class="btn-white w-full py-3 text-2xl">ENTER</button>
       <p class="text-sm mt-3 opacity-70">Admin username: <span class="font-bold">zappa.admin</span></p>
     </div>
-  </div>  <!-- ADMIN -->  <div id="admin-modal" class="hidden fixed inset-0 bg-black text-white z-[10002] p-4 md:p-10 overflow-auto">
+  </div>  <!-- ADMIN MODAL -->  <div id="admin-modal" class="hidden fixed inset-0 bg-black text-white z-[10002] p-4 md:p-10 overflow-auto">
     <div class="max-w-6xl mx-auto">
       <div class="flex justify-between items-center gap-4 flex-wrap mb-8">
         <h2 class="text-5xl">ADMIN PANEL</h2>
-        <div class="flex gap-3 flex-wrap">
-          <button onclick="togglePreviewMode()" class="mini-btn-dark">PREVIEW MODE: <span id="preview-state">OFF</span></button>
-          <button onclick="saveAdmin()" class="mini-btn-dark">SAVE</button>
-          <button onclick="closeAdminModal()" class="mini-btn-dark">EXIT</button>
+        <div class="flex gap-3 flex-wrap items-center">
+          <button onclick="togglePreviewMode()" class="btn-white">PREVIEW: <span id="preview-state">OFF</span></button>
+          <button onclick="saveAdmin()" class="btn-white">SAVE</button>
+          <button onclick="closeAdminModal()" class="btn-white">EXIT</button>
         </div>
       </div><div class="flex gap-3 flex-wrap mb-6">
-    <button onclick="setAdminTab('site')" id="admin-tab-site" class="mini-btn-dark">SITE</button>
-    <button onclick="setAdminTab('boards')" id="admin-tab-boards" class="mini-btn-dark">BOARDS</button>
-    <button onclick="setAdminTab('hardware')" id="admin-tab-hardware" class="mini-btn-dark">HARDWARE</button>
-    <button onclick="setAdminTab('socials')" id="admin-tab-socials" class="mini-btn-dark">SOCIALS</button>
+    <button onclick="setAdminTab('site')" id="admin-tab-site" class="btn-white">SITE</button>
+    <button onclick="setAdminTab('boards')" id="admin-tab-boards" class="btn-white">BOARDS</button>
+    <button onclick="setAdminTab('hardware')" id="admin-tab-hardware" class="btn-white">HARDWARE</button>
+    <button onclick="setAdminTab('socials')" id="admin-tab-socials" class="btn-white">SOCIALS</button>
   </div>
 
   <div id="admin-site-panel" class="space-y-4"></div>
@@ -185,15 +186,12 @@
   <div id="admin-socials-panel" class="hidden space-y-4"></div>
 </div>
 
-  </div>  <footer class="bg-black text-white py-8 text-center mt-12">
+  </div>  <!-- PREVIEW BADGE -->  <div id="preview-badge" class="hidden fixed bottom-4 left-4 z-[10003] bg-white text-black px-4 py-2 rounded-full border border-black text-lg">PREVIEW MODE</div>  <!-- FOOTER -->  <footer class="bg-black text-white py-8 text-center mt-12 border-t border-white">
     <p id="footer-text" class="text-xl">website made by zappa • business owned by Aiden Young</p>
   </footer>  <script>
-    // ---------------------------
-    // State
-    // ---------------------------
-    const STORAGE_KEY = 'zappa_skate_store_v3';
+    const STORAGE_KEY = 'zappa_skate_store_v4';
 
-    let currentTab = 0;
+    let currentMainTab = 0;
     let currentShopTab = 0;
     let currentAuthMode = 'login';
     let currentAdminTab = 'site';
@@ -205,11 +203,12 @@
 
     let user = null;
     let isAdmin = false;
-
     let cart = [];
+    let users = [];
 
     let site = {
       title: 'LATEST FROM ZAPPA SKATE',
+      homeInfo: 'Built for riders • payment soon • stock drops coming',
       footer: 'website made by zappa • business owned by Aiden Young',
       youtubeHandle: '@user',
       youtubeVideoId: 'VIDEO_ID_HERE',
@@ -228,28 +227,32 @@
     };
 
     let boards = [
-      { id: 0, name: 'Zappa Flame Pro', price: 59.99, img: 'https://picsum.photos/id/1015/600/600', desc: '7.75" • Maple • Flames graphic' },
-      { id: 1, name: 'Shred City Cruiser', price: 49.99, img: 'https://picsum.photos/id/160/600/600', desc: '8.0" • Street shape • Abstract waves' },
-      { id: 2, name: 'Park Vert Legend', price: 69.99, img: 'https://picsum.photos/id/201/600/600', desc: '8.25" • Vert shape • Retro skull' },
-      { id: 3, name: 'Street Skull Shredder', price: 54.99, img: 'https://picsum.photos/id/29/600/600', desc: '7.75" • Street shape • Black skull' }
+      { id: 0, name: 'Zappa Flame Pro', price: 59.99, stock: 6, img: 'https://picsum.photos/id/1015/600/600', desc: '7.75" • Maple • Flames graphic' },
+      { id: 1, name: 'Shred City Cruiser', price: 49.99, stock: 5, img: 'https://picsum.photos/id/160/600/600', desc: '8.0" • Street shape • Abstract waves' },
+      { id: 2, name: 'Park Vert Legend', price: 69.99, stock: 4, img: 'https://picsum.photos/id/201/600/600', desc: '8.25" • Vert shape • Retro skull' },
+      { id: 3, name: 'Street Skull Shredder', price: 54.99, stock: 7, img: 'https://picsum.photos/id/29/600/600', desc: '7.75" • Street shape • Black skull' }
     ];
 
     let hardwareList = [
-      { id: 0, name: 'Independent Trucks (pair)', price: 39.99, img: 'https://picsum.photos/id/41/600/600', desc: 'Strong and smooth truck setup.' },
-      { id: 1, name: 'Thunder Alloy Trucks', price: 34.99, img: 'https://picsum.photos/id/42/600/600', desc: 'Lightweight street-ready trucks.' },
-      { id: 2, name: 'Spitfire Formula Four Wheels (set)', price: 29.99, img: 'https://picsum.photos/id/43/600/600', desc: 'Fast wheels with grip and control.' },
-      { id: 3, name: 'Bones Reds Bearings', price: 14.99, img: 'https://picsum.photos/id/44/600/600', desc: 'Smooth rolling bearings for speed.' },
-      { id: 4, name: 'Riser Pads (set of 2)', price: 8.99, img: 'https://picsum.photos/id/45/600/600', desc: 'Keeps wheelbite down.' },
-      { id: 5, name: 'Grip Tape Sheet', price: 12.99, img: 'https://picsum.photos/id/46/600/600', desc: 'Sticky grip for board control.' }
+      { id: 0, name: 'Independent Trucks (pair)', price: 39.99, stock: 8, img: 'https://picsum.photos/id/41/600/600', desc: 'Strong and smooth truck setup.' },
+      { id: 1, name: 'Thunder Alloy Trucks', price: 34.99, stock: 10, img: 'https://picsum.photos/id/42/600/600', desc: 'Lightweight street-ready trucks.' },
+      { id: 2, name: 'Spitfire Formula Four Wheels (set)', price: 29.99, stock: 10, img: 'https://picsum.photos/id/43/600/600', desc: 'Fast wheels with grip and control.' },
+      { id: 3, name: 'Bones Reds Bearings', price: 14.99, stock: 12, img: 'https://picsum.photos/id/44/600/600', desc: 'Smooth rolling bearings for speed.' },
+      { id: 4, name: 'Riser Pads (set of 2)', price: 8.99, stock: 15, img: 'https://picsum.photos/id/45/600/600', desc: 'Keeps wheelbite down.' },
+      { id: 5, name: 'Grip Tape Sheet', price: 12.99, stock: 20, img: 'https://picsum.photos/id/46/600/600', desc: 'Sticky grip for board control.' }
     ];
 
-    let users = [];
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
 
-    // ---------------------------
-    // Storage
-    // ---------------------------
     function saveState() {
-      const data = {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
         users,
         user,
         isAdmin,
@@ -258,8 +261,7 @@
         boards,
         hardwareList,
         previewMode
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }));
     }
 
     function loadState() {
@@ -280,50 +282,43 @@
       }
     }
 
-    // ---------------------------
-    // Tabs
-    // ---------------------------
-    function switchTab(n) {
-      currentTab = n;
-      document.getElementById('home-section').classList.add('hidden');
-      document.getElementById('shop-section').classList.add('hidden');
-      document.getElementById('socials-section').classList.add('hidden');
-      document.getElementById('home-section').classList.toggle('hidden', n !== 0);
-      document.getElementById('shop-section').classList.toggle('hidden', n !== 1);
-      document.getElementById('socials-section').classList.toggle('hidden', n !== 2);
+    function switchMainTab(tabIndex) {
+      currentMainTab = tabIndex;
+      document.getElementById('home-section').classList.toggle('hidden', tabIndex !== 0);
+      document.getElementById('shop-section').classList.toggle('hidden', tabIndex !== 1);
+      document.getElementById('socials-section').classList.toggle('hidden', tabIndex !== 2);
 
-      document.getElementById('nav-home').classList.toggle('tab-active', n === 0);
-      document.getElementById('nav-shop').classList.toggle('tab-active', n === 1);
-      document.getElementById('nav-socials').classList.toggle('tab-active', n === 2);
+      document.getElementById('nav-home').classList.toggle('tab-active', tabIndex === 0);
+      document.getElementById('nav-shop').classList.toggle('tab-active', tabIndex === 1);
+      document.getElementById('nav-socials').classList.toggle('tab-active', tabIndex === 2);
     }
 
-    function switchShopTab(n) {
-      currentShopTab = n;
-      document.getElementById('boards-content').classList.toggle('hidden', n !== 0);
-      document.getElementById('hardware-content').classList.toggle('hidden', n !== 1);
-      document.getElementById('sub-boards').classList.toggle('subtab-active', n === 0);
-      document.getElementById('sub-hardware').classList.toggle('subtab-active', n === 1);
+    function switchShopTab(tabIndex) {
+      currentShopTab = tabIndex;
+      document.getElementById('boards-content').classList.toggle('hidden', tabIndex !== 0);
+      document.getElementById('hardware-content').classList.toggle('hidden', tabIndex !== 1);
+      document.getElementById('sub-boards').classList.toggle('subtab-active', tabIndex === 0);
+      document.getElementById('sub-hardware').classList.toggle('subtab-active', tabIndex === 1);
     }
 
-    // ---------------------------
-    // Render Home / Socials / Shop
-    // ---------------------------
     function renderHome() {
       document.getElementById('site-title').textContent = site.title;
+      document.getElementById('home-info').textContent = site.homeInfo;
+      document.getElementById('footer-text').textContent = site.footer;
       document.getElementById('youtube-embed').src = `https://www.youtube.com/embed/${site.youtubeVideoId}`;
       document.getElementById('home-youtube-handle').textContent = site.youtubeHandle;
-      document.getElementById('footer-text').textContent = site.footer;
 
       const grid = document.getElementById('home-post-grid');
       grid.innerHTML = '';
+
       site.homePosts.forEach((post) => {
         const card = document.createElement('div');
-        card.className = 'border border-black rounded-3xl overflow-hidden soft-shadow bg-white';
+        card.className = 'border border-white rounded-3xl overflow-hidden soft-shadow bg-black';
         card.innerHTML = `
           <img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.platform)}" class="w-full aspect-square object-cover" />
           <div class="p-4">
-            <p class="font-bold">${escapeHtml(post.platform)} • ${escapeHtml(post.handle)}</p>
-            <p class="text-sm">${escapeHtml(post.text)}</p>
+            <p class="font-bold text-xl">${escapeHtml(post.platform)} • ${escapeHtml(post.handle)}</p>
+            <p class="text-sm mt-2 opacity-80">${escapeHtml(post.text)}</p>
           </div>
         `;
         grid.appendChild(card);
@@ -331,17 +326,12 @@
     }
 
     function renderSocials() {
-      document.getElementById('yt').textContent = site.socials.youtube;
-      document.getElementById('ig').textContent = site.socials.instagram;
-      document.getElementById('fb').textContent = site.socials.facebook;
-      document.getElementById('tt').textContent = site.socials.tiktok;
-
       const socialLinks = document.getElementById('social-links');
       socialLinks.innerHTML = `
-        <a href="https://youtube.com/@${encodeURIComponent(site.socials.youtube)}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">📺<br><span class="mt-4">YouTube • ${escapeHtml(site.socials.youtube)}</span></a>
-        <a href="https://instagram.com/${encodeURIComponent(site.socials.instagram.replace('@', ''))}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">📸<br><span class="mt-4">Instagram • ${escapeHtml(site.socials.instagram)}</span></a>
-        <a href="https://facebook.com/${encodeURIComponent(site.socials.facebook)}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">👍<br><span class="mt-4">Facebook • ${escapeHtml(site.socials.facebook)}</span></a>
-        <a href="https://tiktok.com/@${encodeURIComponent(site.socials.tiktok.replace('@', ''))}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">🎵<br><span class="mt-4">TikTok • ${escapeHtml(site.socials.tiktok)}</span></a>
+        <a href="https://youtube.com/@${encodeURIComponent(site.socials.youtube.replace('@', ''))}" target="_blank" class="border-2 border-white rounded-3xl py-12 hover:bg-white hover:text-black text-4xl flex flex-col items-center">📺<br><span class="mt-4">YouTube • ${escapeHtml(site.socials.youtube)}</span></a>
+        <a href="https://instagram.com/${encodeURIComponent(site.socials.instagram.replace('@', ''))}" target="_blank" class="border-2 border-white rounded-3xl py-12 hover:bg-white hover:text-black text-4xl flex flex-col items-center">📸<br><span class="mt-4">Instagram • ${escapeHtml(site.socials.instagram)}</span></a>
+        <a href="https://facebook.com/${encodeURIComponent(site.socials.facebook)}" target="_blank" class="border-2 border-white rounded-3xl py-12 hover:bg-white hover:text-black text-4xl flex flex-col items-center">👍<br><span class="mt-4">Facebook • ${escapeHtml(site.socials.facebook)}</span></a>
+        <a href="https://tiktok.com/@${encodeURIComponent(site.socials.tiktok.replace('@', ''))}" target="_blank" class="border-2 border-white rounded-3xl py-12 hover:bg-white hover:text-black text-4xl flex flex-col items-center">🎵<br><span class="mt-4">TikTok • ${escapeHtml(site.socials.tiktok)}</span></a>
       `;
     }
 
@@ -349,18 +339,24 @@
       const wrap = document.getElementById('boards-content');
       wrap.innerHTML = '';
       boards.forEach((board, index) => {
+        const selected = selectedBoard && selectedBoard.id === board.id;
+        const soldOut = Number(board.stock) <= 0;
         const row = document.createElement('div');
-        row.className = 'product-row cursor-pointer border border-black rounded-3xl overflow-hidden mb-6 bg-white';
+        row.className = `product-row cursor-pointer border border-white rounded-3xl overflow-hidden mb-6 ${selected ? 'bg-white text-black' : 'bg-black text-white'} ${soldOut ? 'opacity-60' : ''}`;
         row.onclick = () => openProductModal('board', index);
         row.innerHTML = `
           <div class="flex items-center gap-4 p-3 md:p-4">
-            <img src="${escapeHtml(board.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-black flex-none" alt="${escapeHtml(board.name)}" />
+            <img src="${escapeHtml(board.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-white flex-none" alt="${escapeHtml(board.name)}" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between gap-3">
                 <h3 class="text-2xl md:text-3xl truncate">${escapeHtml(board.name)}</h3>
-                <p class="text-2xl md:text-3xl whitespace-nowrap">$${board.price.toFixed(2)}</p>
+                <p class="text-2xl md:text-3xl whitespace-nowrap">$${Number(board.price).toFixed(2)}</p>
               </div>
-              <p class="text-sm md:text-base opacity-80 mt-1">${escapeHtml(board.desc || '')}</p>
+              <div class="flex items-center justify-between gap-3 mt-1">
+                <p class="text-sm md:text-base opacity-80">${escapeHtml(board.desc || '')}</p>
+                <p class="text-sm md:text-base font-bold whitespace-nowrap">Stock: ${Number(board.stock)}</p>
+              </div>
+              ${soldOut ? '<p class="text-sm mt-1 font-bold">SOLD OUT</p>' : ''}
             </div>
           </div>
         `;
@@ -372,18 +368,24 @@
       const wrap = document.getElementById('hardware-content');
       wrap.innerHTML = '';
       hardwareList.forEach((item, index) => {
+        const selected = selectedHardware.some((h) => h.id === item.id);
+        const soldOut = Number(item.stock) <= 0;
         const row = document.createElement('div');
-        row.className = 'product-row cursor-pointer border border-black rounded-3xl overflow-hidden mb-6 bg-white';
+        row.className = `product-row cursor-pointer border border-white rounded-3xl overflow-hidden mb-6 ${selected ? 'bg-white text-black' : 'bg-black text-white'} ${soldOut ? 'opacity-60' : ''}`;
         row.onclick = () => openProductModal('hardware', index);
         row.innerHTML = `
           <div class="flex items-center gap-4 p-3 md:p-4">
-            <img src="${escapeHtml(item.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-black flex-none" alt="${escapeHtml(item.name)}" />
+            <img src="${escapeHtml(item.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-white flex-none" alt="${escapeHtml(item.name)}" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between gap-3">
                 <h3 class="text-2xl md:text-3xl truncate">${escapeHtml(item.name)}</h3>
-                <p class="text-2xl md:text-3xl whitespace-nowrap">$${item.price.toFixed(2)}</p>
+                <p class="text-2xl md:text-3xl whitespace-nowrap">$${Number(item.price).toFixed(2)}</p>
               </div>
-              <p class="text-sm md:text-base opacity-80 mt-1">${escapeHtml(item.desc || '')}</p>
+              <div class="flex items-center justify-between gap-3 mt-1">
+                <p class="text-sm md:text-base opacity-80">${escapeHtml(item.desc || '')}</p>
+                <p class="text-sm md:text-base font-bold whitespace-nowrap">Stock: ${Number(item.stock)}</p>
+              </div>
+              ${soldOut ? '<p class="text-sm mt-1 font-bold">SOLD OUT</p>' : ''}
             </div>
           </div>
         `;
@@ -397,7 +399,7 @@
       const totalLabel = document.getElementById('setup-total');
 
       if (selectedBoard) {
-        boardLabel.textContent = `${selectedBoard.name} ($${selectedBoard.price.toFixed(2)})`;
+        boardLabel.textContent = `${selectedBoard.name} ($${Number(selectedBoard.price).toFixed(2)})`;
       } else {
         boardLabel.textContent = '— None yet —';
       }
@@ -412,12 +414,20 @@
     }
 
     function renderCartCount() {
-      document.getElementById('cart-count').textContent = String(cart.length);
+      const fab = document.getElementById('cart-fab');
+      const count = document.getElementById('cart-count');
+      if (cart.length > 0) {
+        fab.classList.remove('hidden');
+        count.textContent = String(cart.length);
+      } else {
+        fab.classList.add('hidden');
+        count.textContent = '0';
+      }
     }
 
     function renderCart() {
       const container = document.getElementById('cart-items');
-      const total = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+      const total = cart.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
       document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
       container.innerHTML = '';
 
@@ -428,170 +438,90 @@
 
       cart.forEach((item, index) => {
         const el = document.createElement('div');
-        el.className = 'flex justify-between items-start border-b border-black pb-6 gap-4';
+        el.className = 'flex justify-between items-start border-b border-white pb-6 gap-4';
         el.innerHTML = `
           <div class="min-w-0">
-            <p class="text-2xl truncate">${escapeHtml(item.boardName || item.name || 'Item')}</p>
-            <p class="text-sm">${escapeHtml(item.hardwareNames?.join(' • ') || '')}</p>
+            <p class="text-2xl truncate">${escapeHtml(item.title || item.boardName || 'Item')}</p>
+            <p class="text-sm opacity-80">${escapeHtml((item.hardwareNames || []).join(' • ') || '')}</p>
           </div>
           <div class="text-right shrink-0">
-            <p class="text-3xl font-bold">$${item.totalPrice.toFixed(2)}</p>
-            <button onclick="removeFromCart(${index})" class="text-red-500 text-xl mt-2">REMOVE</button>
+            <p class="text-3xl font-bold">$${Number(item.totalPrice || 0).toFixed(2)}</p>
+            <button onclick="removeFromCart(${index})" class="mt-2 btn-white text-lg">REMOVE</button>
           </div>
         `;
         container.appendChild(el);
       });
     }
 
-    // ---------------------------
-    // Selection / Modal
-    // ---------------------------
-    function selectBoard(index) {
-      selectedBoard = boards[index];
-      selectedHardware = [];
+    function renderAuthArea() {
+      const authBtn = document.getElementById('auth-btn');
+      const adminBtn = document.getElementById('admin-open-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      if (!user) {
+        authBtn.classList.remove('hidden');
+        adminBtn.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        authBtn.textContent = 'LOGIN';
+      } else {
+        authBtn.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+        logoutBtn.textContent = 'LOGOUT';
+        if (isAdmin) {
+          adminBtn.classList.remove('hidden');
+          adminBtn.textContent = user.username;
+        } else {
+          adminBtn.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderPreviewBadge() {
+      document.getElementById('preview-badge').classList.toggle('hidden', !previewMode);
+      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
+    }
+
+    function renderAll() {
+      renderHome();
+      renderSocials();
+      renderBoards();
+      renderHardware();
       renderSetupSummary();
-      switchShopTab(1);
+      renderCartCount();
+      renderCart();
+      renderAuthArea();
+      renderPreviewBadge();
     }
 
-    function toggleHardware(index) {
-      const item = hardwareList[index];
-      const found = selectedHardware.findIndex((x) => x.id === item.id);
-      if (found >= 0) selectedHardware.splice(found, 1);
-      else selectedHardware.push(item);
-      renderSetupSummary();
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      document.getElementById('auth-title').textContent = mode === 'login' ? 'LOGIN' : 'SIGN UP';
+      document.getElementById('login-tab-btn').classList.toggle('bg-white', mode === 'login');
+      document.getElementById('login-tab-btn').classList.toggle('text-black', mode === 'login');
+      document.getElementById('signup-tab-btn').classList.toggle('bg-white', mode === 'signup');
+      document.getElementById('signup-tab-btn').classList.toggle('text-black', mode === 'signup');
+      document.getElementById('login-tab-btn').classList.toggle('bg-black', mode !== 'login');
+      document.getElementById('login-tab-btn').classList.toggle('text-white', mode !== 'login');
+      document.getElementById('signup-tab-btn').classList.toggle('bg-black', mode !== 'signup');
+      document.getElementById('signup-tab-btn').classList.toggle('text-white', mode !== 'signup');
+      document.getElementById('username-wrap').classList.toggle('hidden', mode === 'login');
     }
 
-    function getCurrentSetupTotal() {
-      const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
-      const boardTotal = selectedBoard ? Number(selectedBoard.price || 0) : 0;
-      return boardTotal + hardwareTotal;
-    }
-
-    function openProductModal(type, index) {
-      selectedModalItem = type === 'board' ? boards[index] : hardwareList[index];
-      const modal = document.getElementById('product-modal');
-      document.getElementById('modal-title').textContent = selectedModalItem.name;
-      document.getElementById('modal-price').textContent = `$${Number(selectedModalItem.price).toFixed(2)}`;
-      document.getElementById('modal-image').src = selectedModalItem.img;
-      document.getElementById('modal-desc').textContent = selectedModalItem.desc || '';
+    function openAuthModal() {
+      if (user) return;
+      const modal = document.getElementById('auth-modal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-    }
-
-    function closeProductModal() {
-      const modal = document.getElementById('product-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      selectedModalItem = null;
-    }
-
-    function modalAddToCart() {
-      if (!selectedModalItem) return;
-      if (boards.some((b) => b.id === selectedModalItem.id)) {
-        cart.push({
-          type: 'board',
-          boardName: selectedModalItem.name,
-          hardwareNames: [],
-          totalPrice: Number(selectedModalItem.price),
-          image: selectedModalItem.img
-        });
-      } else {
-        cart.push({
-          type: 'hardware',
-          boardName: selectedModalItem.name,
-          hardwareNames: [],
-          totalPrice: Number(selectedModalItem.price),
-          image: selectedModalItem.img
-        });
-      }
-      renderCartCount();
-      renderCart();
-      saveState();
-      closeProductModal();
-      alert('Added to cart');
-    }
-
-    function addToCartFromSelection() {
-      if (!selectedBoard) {
-        alert('Please select a board first');
-        return;
-      }
-      const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
-      const totalPrice = Number(selectedBoard.price || 0) + hardwareTotal;
-      cart.push({
-        type: 'setup',
-        boardName: selectedBoard.name,
-        hardwareNames: selectedHardware.map((h) => h.name),
-        totalPrice,
-        image: selectedBoard.img
-      });
-      renderCartCount();
-      renderCart();
-      saveState();
-      selectedBoard = null;
-      selectedHardware = [];
-      renderSetupSummary();
-      alert('Added to cart');
-    }
-
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      renderCartCount();
-      renderCart();
-      saveState();
-    }
-
-    // ---------------------------
-    // Checkout
-    // ---------------------------
-    function proceedCheckout() {
-      alert('Payment soon - we have not released product yet. Be ready though.');
-    }
-
-    // ---------------------------
-    // Cart modal
-    // ---------------------------
-    function toggleCart() {
-      const modal = document.getElementById('cart-modal');
-      const open = modal.classList.contains('hidden');
-      if (open) {
-        renderCart();
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        hideCart();
-      }
-    }
-
-    function hideCart() {
-      const modal = document.getElementById('cart-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    // ---------------------------
-    // Auth
-    // ---------------------------
-    function openAuthModal() {
-      document.getElementById('auth-modal').classList.remove('hidden');
-      document.getElementById('auth-modal').classList.add('flex');
       setAuthMode('login');
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-username').value = '';
     }
 
     function closeAuthModal() {
       const modal = document.getElementById('auth-modal');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
-    }
-
-    function setAuthMode(mode) {
-      currentAuthMode = mode;
-      document.getElementById('auth-title').textContent = mode === 'login' ? 'LOGIN' : 'SIGN UP';
-      document.getElementById('login-tab-btn').classList.toggle('bg-black', mode === 'login');
-      document.getElementById('login-tab-btn').classList.toggle('text-white', mode === 'login');
-      document.getElementById('signup-tab-btn').classList.toggle('bg-black', mode === 'signup');
-      document.getElementById('signup-tab-btn').classList.toggle('text-white', mode === 'signup');
-      document.getElementById('username-wrap').classList.toggle('hidden', mode === 'login');
     }
 
     function submitAuth() {
@@ -613,9 +543,8 @@
           alert('An account with that email already exists');
           return;
         }
-        const newUser = { email: emailVal, password: passVal, username: usernameVal };
-        users.push(newUser);
-        user = newUser;
+        user = { email: emailVal, password: passVal, username: usernameVal };
+        users.push(user);
       } else {
         const found = users.find((u) => u.email.toLowerCase() === emailVal.toLowerCase() && u.password === passVal);
         if (!found) {
@@ -628,31 +557,24 @@
       isAdmin = user.username === 'zappa.admin';
       saveState();
       closeAuthModal();
-      updateAuthButton();
+      renderAll();
       if (isAdmin) openAdminModal();
       alert(`Welcome, ${user.username}`);
-    }
-
-    function updateAuthButton() {
-      const btn = document.getElementById('auth-btn');
-      if (!user) {
-        btn.textContent = 'LOGIN';
-      } else {
-        btn.textContent = user.username.toUpperCase();
-      }
     }
 
     function logout() {
       user = null;
       isAdmin = false;
       saveState();
-      updateAuthButton();
+      renderAll();
+      closeAdminModal();
     }
 
-    // ---------------------------
-    // Admin
-    // ---------------------------
     function openAdminModal() {
+      if (!isAdmin) {
+        alert('Admin access only');
+        return;
+      }
       const modal = document.getElementById('admin-modal');
       modal.classList.remove('hidden');
       renderAdmin();
@@ -662,234 +584,502 @@
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
-    function setAdminTab(tab) {
-      currentAdminTab = tab;
-      const tabs = ['site', 'boards', 'hardware', 'socials'];
-      tabs.forEach((t) => {
-        document.getElementById(`admin-${t}-panel`).classList.toggle('hidden', t !== tab);
-        document.getElementById(`admin-tab-${t}`).classList.toggle('bg-white', t === tab);
-        document.getElementById(`admin-tab-${t}`).classList.toggle('text-black', t === tab);
-        document.getElementById(`admin-tab-${t}`).classList.toggle('bg-black', t !== tab);
-        document.getElementById(`admin-tab-${t}`).classList.toggle('text-white', t !== tab);
+    function setAdminTab(tabName) {
+      currentAdminTab = tabName;
+      ['site', 'boards', 'hardware', 'socials'].forEach((tab) => {
+        document.getElementById(`admin-${tab}-panel`).classList.toggle('hidden', tab !== tabName);
+        const btn = document.getElementById(`admin-tab-${tab}`);
+        btn.classList.toggle('bg-white', tab === tabName);
+        btn.classList.toggle('text-black', tab === tabName);
+        btn.classList.toggle('bg-black', tab !== tabName);
+        btn.classList.toggle('text-white', tab !== tabName);
       });
     }
 
     function togglePreviewMode() {
       previewMode = !previewMode;
-      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
-      if (previewMode) {
-        applyPreviewToLiveUI();
-      } else {
-        renderAll();
+      saveState();
+      renderPreviewBadge();
+    }
+
+    function updateSiteField(field, value) {
+      site[field] = value;
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function updateSocialField(field, value) {
+      site.socials[field] = value;
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function updateHomePostsJson(value) {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          site.homePosts = parsed;
+          saveState();
+          renderAll();
+          renderAdmin();
+        } else {
+          alert('Home posts must be a JSON array');
+        }
+      } catch (err) {
+        alert('Invalid JSON in home posts');
+      }
+    }
+
+    function updateBoardField(index, field, value) {
+      if (!boards[index]) return;
+      if (field === 'price') boards[index][field] = Number(value) || 0;
+      else if (field === 'stock') boards[index][field] = Math.max(0, parseInt(value, 10) || 0);
+      else boards[index][field] = value;
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function updateHardwareField(index, field, value) {
+      if (!hardwareList[index]) return;
+      if (field === 'price') hardwareList[index][field] = Number(value) || 0;
+      else if (field === 'stock') hardwareList[index][field] = Math.max(0, parseInt(value, 10) || 0);
+      else hardwareList[index][field] = value;
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function addBoard() {
+      boards.push({
+        id: Date.now(),
+        name: 'New Board',
+        price: 50,
+        stock: 1,
+        img: 'https://picsum.photos/600/600',
+        desc: 'New board description'
+      });
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function removeBoard(index) {
+      const removed = boards[index];
+      boards.splice(index, 1);
+      if (selectedBoard && removed && selectedBoard.id === removed.id) selectedBoard = null;
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function addHardware() {
+      hardwareList.push({
+        id: Date.now(),
+        name: 'New Hardware',
+        price: 25,
+        stock: 1,
+        img: 'https://picsum.photos/600/600',
+        desc: 'New hardware description'
+      });
+      saveState();
+      renderAll();
+      renderAdmin();
+    }
+
+    function removeHardware(index) {
+      const removed = hardwareList[index];
+      hardwareList.splice(index, 1);
+      if (removed) {
+        selectedHardware = selectedHardware.filter((h) => h.id !== removed.id);
       }
       saveState();
+      renderAll();
+      renderAdmin();
     }
 
     function renderAdmin() {
       document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
       setAdminTab(currentAdminTab);
 
-      document.getElementById('editTitle').value = site.title;
-      document.getElementById('editYT').value = site.youtubeHandle;
-      document.getElementById('editIG').value = site.socials.instagram;
-      document.getElementById('editFB').value = site.socials.facebook;
-      document.getElementById('editTT').value = site.socials.tiktok;
-
       const sitePanel = document.getElementById('admin-site-panel');
       sitePanel.innerHTML = `
         <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="block mb-1 text-xl">Site Title</label>
-            <input id="admin-site-title" value="${escapeHtml(site.title)}" />
+            <label class="field-label">Site Title</label>
+            <input class="panel-input" value="${escapeHtml(site.title)}" onchange="updateSiteField('title', this.value)" />
           </div>
           <div>
-            <label class="block mb-1 text-xl">Footer Text</label>
-            <input id="admin-footer" value="${escapeHtml(site.footer)}" />
+            <label class="field-label">Footer Text</label>
+            <input class="panel-input" value="${escapeHtml(site.footer)}" onchange="updateSiteField('footer', this.value)" />
           </div>
           <div>
-            <label class="block mb-1 text-xl">YouTube Handle</label>
-            <input id="admin-yt-handle" value="${escapeHtml(site.youtubeHandle)}" />
+            <label class="field-label">Home Info Line</label>
+            <input class="panel-input" value="${escapeHtml(site.homeInfo)}" onchange="updateSiteField('homeInfo', this.value)" />
           </div>
           <div>
-            <label class="block mb-1 text-xl">YouTube Video ID</label>
-            <input id="admin-yt-video" value="${escapeHtml(site.youtubeVideoId)}" />
+            <label class="field-label">YouTube Handle</label>
+            <input class="panel-input" value="${escapeHtml(site.youtubeHandle)}" onchange="updateSiteField('youtubeHandle', this.value)" />
+          </div>
+          <div>
+            <label class="field-label">YouTube Video ID</label>
+            <input class="panel-input" value="${escapeHtml(site.youtubeVideoId)}" onchange="updateSiteField('youtubeVideoId', this.value)" />
           </div>
         </div>
         <div class="mt-4">
-          <label class="block mb-1 text-xl">Home Posts (JSON)</label>
-          <textarea id="admin-home-posts" rows="10">${escapeHtml(JSON.stringify(site.homePosts, null, 2))}</textarea></div>
+          <label class="field-label">Home Posts (JSON Array)</label>
+          <textarea id="admin-home-posts" class="panel-textarea"></textarea><div class="mt-3 flex gap-3 flex-wrap">
+        <button class="btn-white" onclick="updateHomePostsJson(document.getElementById('admin-home-posts').value)">APPLY HOME POSTS</button>
+      </div>
+    </div>
   `;
+  document.getElementById('admin-home-posts').value = JSON.stringify(site.homePosts, null, 2);
 
   const boardsPanel = document.getElementById('admin-boards-panel');
   boardsPanel.innerHTML = boards.map((b, i) => `
     <div class="border border-white p-4 rounded-2xl">
       <div class="grid md:grid-cols-2 gap-4">
-        <div><label class="block mb-1 text-xl">Name</label><input id="board-name-${i}" value="${escapeHtml(b.name)}" /></div>
-        <div><label class="block mb-1 text-xl">Price</label><input id="board-price-${i}" type="number" step="0.01" value="${Number(b.price)}" /></div>
-        <div><label class="block mb-1 text-xl">Image URL</label><input id="board-img-${i}" value="${escapeHtml(b.img)}" /></div>
-        <div><label class="block mb-1 text-xl">Description</label><input id="board-desc-${i}" value="${escapeHtml(b.desc || '')}" /></div>
+        <div>
+          <label class="field-label">Name</label>
+          <input class="panel-input" value="${escapeHtml(b.name)}" onchange="updateBoardField(${i}, 'name', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Price</label>
+          <input class="panel-input" type="number" step="0.01" value="${Number(b.price)}" onchange="updateBoardField(${i}, 'price', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Stock</label>
+          <input class="panel-input" type="number" step="1" value="${Number(b.stock)}" onchange="updateBoardField(${i}, 'stock', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Image URL</label>
+          <input class="panel-input" value="${escapeHtml(b.img)}" onchange="updateBoardField(${i}, 'img', this.value)" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="field-label">Description</label>
+          <input class="panel-input" value="${escapeHtml(b.desc || '')}" onchange="updateBoardField(${i}, 'desc', this.value)" />
+        </div>
       </div>
       <div class="mt-3 flex gap-2 flex-wrap">
-        <button class="mini-btn-dark" onclick="removeBoard(${i})">REMOVE</button>
+        <button class="btn-white" onclick="removeBoard(${i})">REMOVE</button>
       </div>
     </div>
-  `).join('') + `
-    <button class="mini-btn-dark" onclick="addBoard()">+ ADD BOARD</button>
-  `;
+  `).join('') + `<button class="btn-white" onclick="addBoard()">+ ADD BOARD</button>`;
 
-  const hwPanel = document.getElementById('admin-hardware-panel');
-  hwPanel.innerHTML = hardwareList.map((h, i) => `
+  const hardwarePanel = document.getElementById('admin-hardware-panel');
+  hardwarePanel.innerHTML = hardwareList.map((h, i) => `
     <div class="border border-white p-4 rounded-2xl">
       <div class="grid md:grid-cols-2 gap-4">
-        <div><label class="block mb-1 text-xl">Name</label><input id="hw-name-${i}" value="${escapeHtml(h.name)}" /></div>
-        <div><label class="block mb-1 text-xl">Price</label><input id="hw-price-${i}" type="number" step="0.01" value="${Number(h.price)}" /></div>
-        <div><label class="block mb-1 text-xl">Image URL</label><input id="hw-img-${i}" value="${escapeHtml(h.img)}" /></div>
-        <div><label class="block mb-1 text-xl">Description</label><input id="hw-desc-${i}" value="${escapeHtml(h.desc || '')}" /></div>
+        <div>
+          <label class="field-label">Name</label>
+          <input class="panel-input" value="${escapeHtml(h.name)}" onchange="updateHardwareField(${i}, 'name', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Price</label>
+          <input class="panel-input" type="number" step="0.01" value="${Number(h.price)}" onchange="updateHardwareField(${i}, 'price', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Stock</label>
+          <input class="panel-input" type="number" step="1" value="${Number(h.stock)}" onchange="updateHardwareField(${i}, 'stock', this.value)" />
+        </div>
+        <div>
+          <label class="field-label">Image URL</label>
+          <input class="panel-input" value="${escapeHtml(h.img)}" onchange="updateHardwareField(${i}, 'img', this.value)" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="field-label">Description</label>
+          <input class="panel-input" value="${escapeHtml(h.desc || '')}" onchange="updateHardwareField(${i}, 'desc', this.value)" />
+        </div>
       </div>
       <div class="mt-3 flex gap-2 flex-wrap">
-        <button class="mini-btn-dark" onclick="removeHardware(${i})">REMOVE</button>
+        <button class="btn-white" onclick="removeHardware(${i})">REMOVE</button>
       </div>
     </div>
-  `).join('') + `
-    <button class="mini-btn-dark" onclick="addHardware()">+ ADD HARDWARE</button>
-  `;
+  `).join('') + `<button class="btn-white" onclick="addHardware()">+ ADD HARDWARE</button>`;
 
   const socialsPanel = document.getElementById('admin-socials-panel');
   socialsPanel.innerHTML = `
     <div class="grid md:grid-cols-2 gap-4">
-      <div><label class="block mb-1 text-xl">YouTube</label><input id="admin-social-youtube" value="${escapeHtml(site.socials.youtube)}" /></div>
-      <div><label class="block mb-1 text-xl">Instagram</label><input id="admin-social-instagram" value="${escapeHtml(site.socials.instagram)}" /></div>
-      <div><label class="block mb-1 text-xl">Facebook</label><input id="admin-social-facebook" value="${escapeHtml(site.socials.facebook)}" /></div>
-      <div><label class="block mb-1 text-xl">TikTok</label><input id="admin-social-tiktok" value="${escapeHtml(site.socials.tiktok)}" /></div>
+      <div><label class="field-label">YouTube</label><input class="panel-input" value="${escapeHtml(site.socials.youtube)}" onchange="updateSocialField('youtube', this.value)" /></div>
+      <div><label class="field-label">Instagram</label><input class="panel-input" value="${escapeHtml(site.socials.instagram)}" onchange="updateSocialField('instagram', this.value)" /></div>
+      <div><label class="field-label">Facebook</label><input class="panel-input" value="${escapeHtml(site.socials.facebook)}" onchange="updateSocialField('facebook', this.value)" /></div>
+      <div><label class="field-label">TikTok</label><input class="panel-input" value="${escapeHtml(site.socials.tiktok)}" onchange="updateSocialField('tiktok', this.value)" /></div>
     </div>
   `;
-
-  setAdminTab(currentAdminTab);
 }
 
-function addBoard() {
-  boards.push({
-    id: Date.now(),
-    name: 'New Board',
-    price: 50,
-    img: 'https://picsum.photos/600/600',
-    desc: 'New board description'
+function getCurrentSetupTotal() {
+  const boardTotal = selectedBoard ? Number(selectedBoard.price || 0) : 0;
+  const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  return boardTotal + hardwareTotal;
+}
+
+function hasStockForItem(product) {
+  return Number(product.stock || 0) > 0;
+}
+
+function hasStockForSelection() {
+  if (!selectedBoard || !hasStockForItem(selectedBoard)) return false;
+  return selectedHardware.every((item) => hasStockForItem(item));
+}
+
+function decrementStock(product) {
+  const boardMatch = boards.find((b) => b.id === product.id);
+  if (boardMatch) {
+    boardMatch.stock = Math.max(0, Number(boardMatch.stock || 0) - 1);
+    return;
+  }
+  const hwMatch = hardwareList.find((h) => h.id === product.id);
+  if (hwMatch) {
+    hwMatch.stock = Math.max(0, Number(hwMatch.stock || 0) - 1);
+  }
+}
+
+function incrementStock(product) {
+  const boardMatch = boards.find((b) => b.id === product.id);
+  if (boardMatch) {
+    boardMatch.stock = Number(boardMatch.stock || 0) + 1;
+    return;
+  }
+  const hwMatch = hardwareList.find((h) => h.id === product.id);
+  if (hwMatch) {
+    hwMatch.stock = Number(hwMatch.stock || 0) + 1;
+  }
+}
+
+function openProductModal(type, index) {
+  selectedModalItem = {
+    type,
+    item: type === 'board' ? boards[index] : hardwareList[index]
+  };
+
+  const item = selectedModalItem.item;
+  document.getElementById('modal-title').textContent = item.name;
+  document.getElementById('modal-price').textContent = `$${Number(item.price).toFixed(2)}`;
+  document.getElementById('modal-stock').textContent = `Stock: ${Number(item.stock)}`;
+  document.getElementById('modal-image').src = item.img;
+  document.getElementById('modal-desc').textContent = item.desc || '';
+
+  const setupBtn = document.getElementById('modal-setup-btn');
+  const cartBtn = document.getElementById('modal-cart-btn');
+  const soldOut = !hasStockForItem(item);
+  setupBtn.disabled = soldOut;
+  cartBtn.disabled = soldOut;
+  setupBtn.textContent = type === 'board' ? 'USE FOR SETUP' : 'ADD TO SETUP';
+  cartBtn.textContent = type === 'board' ? 'ADD BOARD TO CART' : 'ADD HARDWARE TO CART';
+
+  setupBtn.style.opacity = soldOut ? '0.45' : '1';
+  cartBtn.style.opacity = soldOut ? '0.45' : '1';
+
+  const modal = document.getElementById('product-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeProductModal() {
+  const modal = document.getElementById('product-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  selectedModalItem = null;
+}
+
+function modalUseForSetup() {
+  if (!selectedModalItem) return;
+  const { type, item } = selectedModalItem;
+  if (!hasStockForItem(item)) {
+    alert('Sold out');
+    return;
+  }
+  if (type === 'board') {
+    selectedBoard = item;
+  } else {
+    const exists = selectedHardware.findIndex((h) => h.id === item.id);
+    if (exists >= 0) selectedHardware.splice(exists, 1);
+    else selectedHardware.push(item);
+  }
+  renderAll();
+  closeProductModal();
+}
+
+function modalAddToCart() {
+  if (!selectedModalItem) return;
+  const { item } = selectedModalItem;
+  if (!hasStockForItem(item)) {
+    alert('Sold out');
+    return;
+  }
+
+  const cartItem = {
+    type: selectedModalItem.type,
+    title: item.name,
+    boardName: selectedModalItem.type === 'board' ? item.name : item.name,
+    hardwareNames: [],
+    totalPrice: Number(item.price || 0),
+    image: item.img,
+    components: [{ id: item.id, type: selectedModalItem.type, name: item.name }]
+  };
+
+  cart.push(cartItem);
+  decrementStock(item);
+  saveState();
+  renderAll();
+  closeProductModal();
+  alert('Added to cart');
+}
+
+function addSetupToCart() {
+  if (!selectedBoard) {
+    alert('Please select a board first');
+    return;
+  }
+  if (!hasStockForSelection()) {
+    alert('One or more selected items are sold out');
+    return;
+  }
+
+  const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const totalPrice = Number(selectedBoard.price || 0) + hardwareTotal;
+
+  cart.push({
+    type: 'setup',
+    title: `${selectedBoard.name}${selectedHardware.length ? ' + ' + selectedHardware.map((h) => h.name).join(' + ') : ''}`,
+    boardName: selectedBoard.name,
+    hardwareNames: selectedHardware.map((h) => h.name),
+    totalPrice,
+    image: selectedBoard.img,
+    components: [
+      { id: selectedBoard.id, type: 'board', name: selectedBoard.name },
+      ...selectedHardware.map((h) => ({ id: h.id, type: 'hardware', name: h.name }))
+    ]
   });
-  renderAdmin();
+
+  decrementStock(selectedBoard);
+  selectedHardware.forEach((item) => decrementStock(item));
+
+  selectedBoard = null;
+  selectedHardware = [];
   saveState();
+  renderAll();
+  alert('Added to cart');
 }
 
-function removeBoard(index) {
-  boards.splice(index, 1);
-  renderAdmin();
+function removeFromCart(index) {
+  const item = cart[index];
+  if (!item) return;
+  if (Array.isArray(item.components)) {
+    item.components.forEach((component) => {
+      const boardMatch = boards.find((b) => b.id === component.id);
+      if (boardMatch) boardMatch.stock = Number(boardMatch.stock || 0) + 1;
+      const hwMatch = hardwareList.find((h) => h.id === component.id);
+      if (hwMatch) hwMatch.stock = Number(hwMatch.stock || 0) + 1;
+    });
+  }
+  cart.splice(index, 1);
   saveState();
+  renderAll();
 }
 
-function addHardware() {
-  hardwareList.push({
-    id: Date.now(),
-    name: 'New Hardware',
-    price: 25,
-    img: 'https://picsum.photos/600/600',
-    desc: 'New hardware description'
-  });
-  renderAdmin();
-  saveState();
+function proceedCheckout() {
+  alert('Payment soon - we have not released product yet. Be ready though.');
 }
 
-function removeHardware(index) {
-  hardwareList.splice(index, 1);
-  renderAdmin();
-  saveState();
+function toggleCart() {
+  const modal = document.getElementById('cart-modal');
+  const open = modal.classList.contains('hidden');
+  if (open) {
+    renderCart();
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  } else {
+    hideCart();
+  }
+}
+
+function hideCart() {
+  const modal = document.getElementById('cart-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
 function saveAdmin() {
-  site.title = document.getElementById('admin-site-title').value.trim() || site.title;
-  site.footer = document.getElementById('admin-footer').value.trim() || site.footer;
-  site.youtubeHandle = document.getElementById('admin-yt-handle').value.trim() || site.youtubeHandle;
-  site.youtubeVideoId = document.getElementById('admin-yt-video').value.trim() || site.youtubeVideoId;
-  site.socials.youtube = document.getElementById('admin-social-youtube').value.trim() || site.socials.youtube;
-  site.socials.instagram = document.getElementById('admin-social-instagram').value.trim() || site.socials.instagram;
-  site.socials.facebook = document.getElementById('admin-social-facebook').value.trim() || site.socials.facebook;
-  site.socials.tiktok = document.getElementById('admin-social-tiktok').value.trim() || site.socials.tiktok;
-
-  const postsText = document.getElementById('admin-home-posts').value.trim();
-  try {
-    const parsedPosts = JSON.parse(postsText);
-    if (Array.isArray(parsedPosts)) site.homePosts = parsedPosts;
-  } catch {
-    alert('Home posts JSON is invalid. Your other changes were still saved.');
-  }
-
-  boards.forEach((b, i) => {
-    b.name = document.getElementById(`board-name-${i}`).value.trim() || b.name;
-    b.price = parseFloat(document.getElementById(`board-price-${i}`).value) || 0;
-    b.img = document.getElementById(`board-img-${i}`).value.trim() || b.img;
-    b.desc = document.getElementById(`board-desc-${i}`).value.trim() || '';
-  });
-
-  hardwareList.forEach((h, i) => {
-    h.name = document.getElementById(`hw-name-${i}`).value.trim() || h.name;
-    h.price = parseFloat(document.getElementById(`hw-price-${i}`).value) || 0;
-    h.img = document.getElementById(`hw-img-${i}`).value.trim() || h.img;
-    h.desc = document.getElementById(`hw-desc-${i}`).value.trim() || '';
-  });
-
-  renderAll();
   saveState();
+  renderAll();
+  renderAdmin();
   alert('Saved');
 }
 
-function previewAdmin() {
-  applyPreviewToLiveUI();
-  alert('Preview applied');
-}
-
-function applyPreviewToLiveUI() {
+function setSiteField(field, value) {
+  site[field] = value;
+  saveState();
   renderAll();
+  renderAdmin();
 }
 
-// ---------------------------
-// Helpers
-// ---------------------------
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+function openLoginFromTopRight() {
+  openAuthModal();
 }
 
-// ---------------------------
-// Initial render
-// ---------------------------
-function renderAll() {
-  renderHome();
-  renderSocials();
-  renderBoards();
-  renderHardware();
-  renderSetupSummary();
-  renderCartCount();
-  renderCart();
-  updateAuthButton();
-  document.getElementById('footer-text').textContent = site.footer;
-  if (previewMode) document.getElementById('preview-state').textContent = 'ON';
+function renderAuthButtonBehavior() {
+  const authBtn = document.getElementById('auth-btn');
+  authBtn.onclick = user ? (() => {}) : openAuthModal;
 }
 
-// ---------------------------
-// Boot
-// ---------------------------
-window.onload = () => {
+window.switchMainTab = switchMainTab;
+window.switchShopTab = switchShopTab;
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.setAuthMode = setAuthMode;
+window.submitAuth = submitAuth;
+window.logout = logout;
+window.openAdminModal = openAdminModal;
+window.closeAdminModal = closeAdminModal;
+window.setAdminTab = setAdminTab;
+window.togglePreviewMode = togglePreviewMode;
+window.updateSiteField = updateSiteField;
+window.updateSocialField = updateSocialField;
+window.updateHomePostsJson = updateHomePostsJson;
+window.updateBoardField = updateBoardField;
+window.updateHardwareField = updateHardwareField;
+window.addBoard = addBoard;
+window.removeBoard = removeBoard;
+window.addHardware = addHardware;
+window.removeHardware = removeHardware;
+window.openProductModal = openProductModal;
+window.closeProductModal = closeProductModal;
+window.modalUseForSetup = modalUseForSetup;
+window.modalAddToCart = modalAddToCart;
+window.addSetupToCart = addSetupToCart;
+window.removeFromCart = removeFromCart;
+window.proceedCheckout = proceedCheckout;
+window.toggleCart = toggleCart;
+window.hideCart = hideCart;
+window.saveAdmin = saveAdmin;
+
+function boot() {
   loadState();
   renderAll();
-  switchTab(0);
-  switchShopTab(0);
   setAuthMode('login');
+  switchMainTab(0);
+  switchShopTab(0);
+  renderAuthButtonBehavior();
   if (isAdmin) {
-    openAdminModal();
+    document.getElementById('admin-open-btn').classList.remove('hidden');
+    document.getElementById('logout-btn').classList.remove('hidden');
+    document.getElementById('auth-btn').classList.add('hidden');
   }
-};
+}
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeProductModal();
+    closeAuthModal();
+    hideCart();
+  }
+});
+
+window.onload = boot;
 
   </script>
 </body>
