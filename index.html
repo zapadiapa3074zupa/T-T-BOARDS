@@ -2,16 +2,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zappa Skate | Boards • Hardware • Shred</title>
+  <title>Through & Through | Skate Shop</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
     body { font-family: 'Anton', sans-serif; }
     .tab-active { border-bottom: 4px solid #fff; }
     .subtab-active { border-bottom: 3px solid #fff; }
-    .cart-circle { width: 52px; height: 52px; transition: transform 0.2s ease, opacity 0.2s ease; }
+    .hide { display: none; }
+    .cart-circle { width: 52px; height: 52px; transition: transform 0.2s ease; }
     .cart-circle:hover { transform: scale(1.08); }
-    @media (max-width: 768px) { .cart-circle { width: 42px; height: 42px; } }
+    @media (max-width: 768px) {
+      .cart-circle { width: 42px; height: 42px; }
+    }
     .product-row { transition: transform 0.18s ease, background-color 0.18s ease; }
     .product-row:hover { transform: translateY(-1px); }
     .modal-backdrop { backdrop-filter: blur(6px); }
@@ -22,7 +25,7 @@
       border: 1px solid #fff;
       border-radius: 1rem;
       padding: 0.85rem 1.1rem;
-      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      transition: transform 0.18s ease, opacity 0.18s ease;
     }
     .btn-white:hover { transform: scale(1.03); opacity: 0.92; }
     .btn-dark {
@@ -30,7 +33,7 @@
       color: #fff;
       border: 1px solid #fff;
       border-radius: 1rem;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1.1rem;
       transition: transform 0.18s ease, opacity 0.18s ease;
     }
     .btn-dark:hover { transform: scale(1.03); opacity: 0.92; }
@@ -46,20 +49,23 @@
     }
     .panel-textarea { min-height: 160px; resize: vertical; }
     .field-label { font-size: 1.1rem; margin-bottom: 0.35rem; display: block; }
+    .error-text { color: #ef4444; font-size: 1rem; line-height: 1.3; margin-top: 0.25rem; }
+    .hint-text { color: rgba(255,255,255,0.55); font-size: 0.95rem; line-height: 1.2; margin-top: 0.2rem; }
   </style>
 </head>
 <body class="bg-black text-white">  <!-- NAVBAR -->  <nav class="border-b border-white sticky top-0 bg-black z-50">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-center items-center gap-12 text-2xl">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-center items-center gap-8 md:gap-12 text-2xl md:text-3xl flex-wrap">
       <button onclick="switchMainTab(0)" id="nav-home" class="tab-active hover:opacity-80">HOME</button>
       <button onclick="switchMainTab(1)" id="nav-shop" class="hover:opacity-80">SHOP</button>
       <button onclick="switchMainTab(2)" id="nav-socials" class="hover:opacity-80">SOCIALS</button>
+      <button onclick="switchMainTab(3)" id="nav-login" class="hover:opacity-80">LOGIN</button>
     </div>
-  </nav>  <!-- TOP RIGHT AUTH -->  <div class="absolute top-4 right-4 z-40 flex gap-2 items-center">
-    <button id="auth-btn" onclick="openAuthModal()" class="btn-white">LOGIN</button>
-    <button id="admin-open-btn" onclick="openAdminModal()" class="btn-white hidden">ADMIN</button>
-    <button id="logout-btn" onclick="logout()" class="btn-white hidden">LOGOUT</button>
-  </div>  <!-- HOME -->  <div id="home-section" class="max-w-6xl mx-auto px-6 py-12">
-    <h1 id="site-title" class="text-6xl font-bold text-center mb-4">LATEST FROM ZAPPA SKATE</h1>
+  </nav>  <!-- TOP RIGHT AUTH STATE -->  <div class="absolute top-4 right-4 z-40 flex gap-2 items-center">
+    <button id="auth-state-btn" onclick="switchMainTab(3)" class="btn-white">LOGIN</button>
+    <button id="admin-open-btn" onclick="openAdminPanel()" class="btn-white hide">ADMIN</button>
+    <button id="logout-btn" onclick="logout()" class="btn-white hide">LOGOUT</button>
+  </div>  <!-- HOME -->  <section id="home-section" class="max-w-6xl mx-auto px-6 py-12">
+    <h1 id="home-title" class="text-6xl font-bold text-center mb-4">LATEST FROM ZAPPA SKATE</h1>
     <p id="home-info" class="text-center text-xl mb-12 opacity-80">Built for riders • payment soon • stock drops coming</p><div class="mb-16">
   <h2 id="home-video-heading" class="text-4xl mb-4">Latest YouTube Video</h2>
   <div class="aspect-video bg-black rounded-2xl overflow-hidden border border-white soft-shadow">
@@ -71,8 +77,8 @@
 <h2 id="home-posts-heading" class="text-4xl mb-8 text-center">Latest Posts Across Socials</h2>
 <div id="home-post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
-  </div>  <!-- SHOP -->  <div id="shop-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
-    <h1 id="shop-title" class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-white">
+  </section>  <!-- SHOP -->  <section id="shop-section" class="max-w-6xl mx-auto px-6 py-12 hide">
+    <h1 id="shop-title" class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-white flex-wrap">
   <button onclick="switchShopTab(0)" id="sub-boards" class="subtab-active text-3xl pb-2">BOARDS</button>
   <button onclick="switchShopTab(1)" id="sub-hardware" class="text-3xl pb-2">HARDWARE</button>
 </div>
@@ -97,12 +103,43 @@
 </div>
 
 <div id="boards-content"></div>
-<div id="hardware-content" class="hidden"></div>
+<div id="hardware-content" class="hide"></div>
 
-  </div>  <!-- SOCIALS -->  <div id="socials-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
+  </section>  <!-- SOCIALS -->  <section id="socials-section" class="max-w-6xl mx-auto px-6 py-12 hide">
     <h1 id="socials-title" class="text-6xl font-bold text-center mb-12">FOLLOW THE SHRED</h1>
     <div id="social-links" class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"></div>
-  </div>  <!-- CART BUTTON -->  <button id="cart-fab" onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-white text-black rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110 hidden">
+  </section>  <!-- LOGIN -->  <section id="login-section" class="max-w-2xl mx-auto px-6 py-12 hide">
+    <h2 id="login-page-title" class="text-5xl text-center mb-8">LOGIN BELOW</h2><div class="flex gap-3 mb-6 justify-center flex-wrap">
+  <button id="login-mode-btn" class="btn-white" onclick="setAuthMode('login')">LOGIN</button>
+  <button id="signup-mode-btn" class="btn-white" onclick="setAuthMode('signup')">SIGN UP</button>
+</div>
+
+<div id="login-form" class="space-y-4">
+  <div>
+    <label class="field-label">Email:</label>
+    <input id="auth-email" class="panel-input" type="email" placeholder="example@domain.com" />
+  </div>
+  <div>
+    <label class="field-label">Password:</label>
+    <input id="auth-password" class="panel-input" type="password" placeholder="Example123%" />
+    <div id="login-password-hint" class="hint-text">Must include 1 capital letter, 1 number, and 1 symbol.</div>
+  </div>
+  <div id="confirm-wrap" class="hide">
+    <label class="field-label">Confirm Password:</label>
+    <input id="auth-confirm" class="panel-input" type="password" placeholder="Example123%" />
+  </div>
+  <div id="username-wrap" class="hide">
+    <label class="field-label">Username:</label>
+    <input id="auth-username" class="panel-input" type="text" placeholder="username" />
+  </div>
+
+  <p id="auth-error" class="error-text"></p>
+
+  <button id="auth-submit-btn" onclick="submitAuth()" class="btn-white w-full text-2xl py-3">LOGIN</button>
+  <p class="text-sm opacity-70 text-center">Admin email only: <span class="font-bold">Zappa.admin</span></p>
+</div>
+
+  </section>  <!-- CART BUTTON -->  <button id="cart-fab" onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-white text-black rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110 hide">
     🛒
     <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
   </button>  <!-- CART MODAL -->  <div id="cart-modal" class="hidden fixed inset-0 bg-black/70 modal-backdrop items-end md:items-center justify-center z-[9999]">
@@ -143,27 +180,6 @@
         </div>
       </div>
     </div>
-  </div>  <!-- AUTH MODAL -->  <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 modal-backdrop items-center justify-center z-[10001] p-4">
-    <div class="bg-black text-white border border-white p-6 w-full max-w-md rounded-3xl soft-shadow">
-      <div class="flex justify-between items-center mb-4 gap-4">
-        <h2 id="auth-title" class="text-3xl">LOGIN</h2>
-        <button onclick="closeAuthModal()" class="text-3xl leading-none">✕</button>
-      </div>
-      <div class="flex gap-3 mb-4 flex-wrap">
-        <button id="login-tab-btn" onclick="setAuthMode('login')" class="btn-white">LOGIN</button>
-        <button id="signup-tab-btn" onclick="setAuthMode('signup')" class="btn-white">SIGN UP</button>
-      </div>
-      <label class="field-label">Email</label>
-      <input id="auth-email" type="email" placeholder="email@example.com" class="mb-3 panel-input" />
-      <label class="field-label">Password</label>
-      <input id="auth-password" type="password" placeholder="password" class="mb-3 panel-input" />
-      <div id="username-wrap" class="hidden">
-        <label class="field-label">Username</label>
-        <input id="auth-username" type="text" placeholder="username" class="mb-3 panel-input" />
-      </div>
-      <button onclick="submitAuth()" class="btn-white w-full py-3 text-2xl">ENTER</button>
-      <p class="text-sm mt-3 opacity-70">Admin username: <span class="font-bold">zappa.admin</span></p>
-    </div>
   </div>  <!-- ADMIN MODAL -->  <div id="admin-modal" class="hidden fixed inset-0 bg-black text-white z-[10002] p-4 md:p-10 overflow-auto">
     <div class="max-w-6xl mx-auto">
       <div class="flex justify-between items-center gap-4 flex-wrap mb-8">
@@ -171,7 +187,7 @@
         <div class="flex gap-3 flex-wrap items-center">
           <button onclick="togglePreviewMode()" class="btn-white">PREVIEW: <span id="preview-state">OFF</span></button>
           <button onclick="saveAdmin()" class="btn-white">SAVE</button>
-          <button onclick="closeAdminModal()" class="btn-white">EXIT</button>
+          <button onclick="closeAdminPanel()" class="btn-white">EXIT</button>
         </div>
       </div><div class="flex gap-3 flex-wrap mb-6">
     <button onclick="setAdminTab('home')" id="admin-tab-home" class="btn-white">HOME</button>
@@ -191,7 +207,7 @@
   </div>  <!-- PREVIEW BADGE -->  <div id="preview-badge" class="hidden fixed bottom-4 left-4 z-[10003] bg-white text-black px-4 py-2 rounded-full border border-black text-lg">PREVIEW MODE</div>  <!-- FOOTER -->  <footer class="bg-black text-white py-8 text-center mt-12 border-t border-white">
     <p id="footer-text" class="text-xl">website made by zappa • business owned by Aiden Young</p>
   </footer>  <script>
-    const STORAGE_KEY = 'zappa_skate_store_v5';
+    const STORAGE_KEY = 'through_and_through_store_v6';
 
     let currentMainTab = 0;
     let currentShopTab = 0;
@@ -289,25 +305,31 @@
 
     function switchMainTab(tabIndex) {
       currentMainTab = tabIndex;
-      document.getElementById('home-section').classList.toggle('hidden', tabIndex !== 0);
-      document.getElementById('shop-section').classList.toggle('hidden', tabIndex !== 1);
-      document.getElementById('socials-section').classList.toggle('hidden', tabIndex !== 2);
+      document.getElementById('home-section').classList.toggle('hide', tabIndex !== 0);
+      document.getElementById('shop-section').classList.toggle('hide', tabIndex !== 1);
+      document.getElementById('socials-section').classList.toggle('hide', tabIndex !== 2);
+      document.getElementById('login-section').classList.toggle('hide', tabIndex !== 3);
 
       document.getElementById('nav-home').classList.toggle('tab-active', tabIndex === 0);
       document.getElementById('nav-shop').classList.toggle('tab-active', tabIndex === 1);
       document.getElementById('nav-socials').classList.toggle('tab-active', tabIndex === 2);
+      document.getElementById('nav-login').classList.toggle('tab-active', tabIndex === 3);
+
+      if (tabIndex === 3) {
+        renderAuthPage();
+      }
     }
 
     function switchShopTab(tabIndex) {
       currentShopTab = tabIndex;
-      document.getElementById('boards-content').classList.toggle('hidden', tabIndex !== 0);
-      document.getElementById('hardware-content').classList.toggle('hidden', tabIndex !== 1);
+      document.getElementById('boards-content').classList.toggle('hide', tabIndex !== 0);
+      document.getElementById('hardware-content').classList.toggle('hide', tabIndex !== 1);
       document.getElementById('sub-boards').classList.toggle('subtab-active', tabIndex === 0);
       document.getElementById('sub-hardware').classList.toggle('subtab-active', tabIndex === 1);
     }
 
     function renderHome() {
-      document.getElementById('site-title').textContent = site.title;
+      document.getElementById('home-title').textContent = site.title;
       document.getElementById('home-info').textContent = site.homeInfo;
       document.getElementById('home-video-heading').textContent = site.homeVideoHeading;
       document.getElementById('home-posts-heading').textContent = site.homePostsHeading;
@@ -405,17 +427,11 @@
       const hardwareLabel = document.getElementById('selected-hardware-list');
       const totalLabel = document.getElementById('setup-total');
 
-      if (selectedBoard) {
-        boardLabel.textContent = `${selectedBoard.name} ($${Number(selectedBoard.price).toFixed(2)})`;
-      } else {
-        boardLabel.textContent = '— None yet —';
-      }
+      if (selectedBoard) boardLabel.textContent = `${selectedBoard.name} ($${Number(selectedBoard.price).toFixed(2)})`;
+      else boardLabel.textContent = '— None yet —';
 
-      if (selectedHardware.length) {
-        hardwareLabel.textContent = selectedHardware.map((h) => h.name).join(' + ');
-      } else {
-        hardwareLabel.textContent = '—';
-      }
+      if (selectedHardware.length) hardwareLabel.textContent = selectedHardware.map((h) => h.name).join(' + ');
+      else hardwareLabel.textContent = '—';
 
       totalLabel.textContent = `$${getCurrentSetupTotal().toFixed(2)}`;
     }
@@ -424,10 +440,10 @@
       const fab = document.getElementById('cart-fab');
       const count = document.getElementById('cart-count');
       if (cart.length > 0) {
-        fab.classList.remove('hidden');
+        fab.classList.remove('hide');
         count.textContent = String(cart.length);
       } else {
-        fab.classList.add('hidden');
+        fab.classList.add('hide');
         count.textContent = '0';
       }
     }
@@ -460,31 +476,29 @@
       });
     }
 
-    function renderAuthArea() {
-      const authBtn = document.getElementById('auth-btn');
+    function renderAuthState() {
+      const btn = document.getElementById('auth-state-btn');
       const adminBtn = document.getElementById('admin-open-btn');
       const logoutBtn = document.getElementById('logout-btn');
-
       if (!user) {
-        authBtn.classList.remove('hidden');
-        adminBtn.classList.add('hidden');
-        logoutBtn.classList.add('hidden');
-        authBtn.textContent = 'LOGIN';
+        btn.classList.remove('hide');
+        btn.textContent = 'LOGIN';
+        adminBtn.classList.add('hide');
+        logoutBtn.classList.add('hide');
       } else {
-        authBtn.classList.add('hidden');
-        logoutBtn.classList.remove('hidden');
-        logoutBtn.textContent = 'LOGOUT';
+        btn.classList.add('hide');
+        logoutBtn.classList.remove('hide');
         if (isAdmin) {
-          adminBtn.classList.remove('hidden');
-          adminBtn.textContent = user.username;
+          adminBtn.classList.remove('hide');
+          adminBtn.textContent = user.email;
         } else {
-          adminBtn.classList.add('hidden');
+          adminBtn.classList.add('hide');
         }
       }
     }
 
     function renderPreviewBadge() {
-      document.getElementById('preview-badge').classList.toggle('hidden', !previewMode);
+      document.getElementById('preview-badge').classList.toggle('hide', !previewMode);
       document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
     }
 
@@ -496,77 +510,120 @@
       renderSetupSummary();
       renderCartCount();
       renderCart();
-      renderAuthArea();
+      renderAuthState();
       renderPreviewBadge();
+    }
+
+    function renderAuthPage() {
+      document.getElementById('login-page-title').textContent = currentAuthMode === 'login' ? 'LOGIN BELOW' : 'SIGN UP';
+      document.getElementById('login-mode-btn').classList.toggle('bg-white', currentAuthMode === 'login');
+      document.getElementById('login-mode-btn').classList.toggle('text-black', currentAuthMode === 'login');
+      document.getElementById('signup-mode-btn').classList.toggle('bg-white', currentAuthMode === 'signup');
+      document.getElementById('signup-mode-btn').classList.toggle('text-black', currentAuthMode === 'signup');
+
+      document.getElementById('confirm-wrap').classList.toggle('hide', currentAuthMode !== 'signup');
+      document.getElementById('username-wrap').classList.toggle('hide', currentAuthMode !== 'signup');
+      document.getElementById('auth-submit-btn').textContent = currentAuthMode === 'login' ? 'LOGIN' : 'SIGN UP';
+      document.getElementById('auth-error').textContent = '';
+
+      const passHint = document.getElementById('login-password-hint');
+      passHint.textContent = 'Must include 1 capital letter, 1 number, and 1 symbol.';
+      passHint.style.display = 'block';
     }
 
     function setAuthMode(mode) {
       currentAuthMode = mode;
-      document.getElementById('auth-title').textContent = mode === 'login' ? 'LOGIN' : 'SIGN UP';
-      document.getElementById('login-tab-btn').classList.toggle('bg-white', mode === 'login');
-      document.getElementById('login-tab-btn').classList.toggle('text-black', mode === 'login');
-      document.getElementById('signup-tab-btn').classList.toggle('bg-white', mode === 'signup');
-      document.getElementById('signup-tab-btn').classList.toggle('text-black', mode === 'signup');
-      document.getElementById('login-tab-btn').classList.toggle('bg-black', mode !== 'login');
-      document.getElementById('login-tab-btn').classList.toggle('text-white', mode !== 'login');
-      document.getElementById('signup-tab-btn').classList.toggle('bg-black', mode !== 'signup');
-      document.getElementById('signup-tab-btn').classList.toggle('text-white', mode !== 'signup');
-      document.getElementById('username-wrap').classList.toggle('hidden', mode === 'login');
+      switchMainTab(3);
+      renderAuthPage();
     }
 
-    function openAuthModal() {
-      if (user) return;
-      const modal = document.getElementById('auth-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      setAuthMode('login');
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-password').value = '';
-      document.getElementById('auth-username').value = '';
-    }
-
-    function closeAuthModal() {
-      const modal = document.getElementById('auth-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+    function passwordRequirements(password) {
+      const missing = [];
+      if (!/[A-Z]/.test(password)) missing.push('1 capital letter');
+      if (!/[0-9]/.test(password)) missing.push('1 number');
+      if (!/[^A-Za-z0-9]/.test(password)) missing.push('1 symbol');
+      return missing;
     }
 
     function submitAuth() {
-      const emailVal = document.getElementById('auth-email').value.trim();
-      const passVal = document.getElementById('auth-password').value.trim();
-      const usernameVal = document.getElementById('auth-username').value.trim();
+      const errorEl = document.getElementById('auth-error');
+      errorEl.textContent = '';
 
-      if (!emailVal || !passVal) {
-        alert('Please enter email and password');
+      const emailVal = document.getElementById('auth-email').value.trim();
+      const passwordVal = document.getElementById('auth-password').value.trim();
+      const usernameVal = document.getElementById('auth-username').value.trim();
+      const confirmVal = document.getElementById('auth-confirm').value.trim();
+
+      if (!emailVal) {
+        errorEl.textContent = 'Please enter an email.';
         return;
       }
 
-      if (currentAuthMode === 'signup') {
-        if (!usernameVal) {
-          alert('Please enter a username');
-          return;
-        }
-        if (users.some((u) => u.email.toLowerCase() === emailVal.toLowerCase())) {
-          alert('An account with that email already exists');
-          return;
-        }
-        user = { email: emailVal, password: passVal, username: usernameVal };
-        users.push(user);
-      } else {
-        const found = users.find((u) => u.email.toLowerCase() === emailVal.toLowerCase() && u.password === passVal);
-        if (!found) {
-          alert('Invalid login');
-          return;
-        }
-        user = found;
+      if (emailVal.toLowerCase() === 'zappa.admin') {
+        user = { email: 'Zappa.admin', username: 'admin' };
+        isAdmin = true;
+        saveState();
+        renderAll();
+        openAdminPanel();
+        return;
       }
 
-      isAdmin = user.username === 'zappa.admin';
+      if (currentAuthMode === 'login') {
+        if (!passwordVal) {
+          errorEl.textContent = 'Please enter a password.';
+          return;
+        }
+        const existing = users.find((u) => u.email.toLowerCase() === emailVal.toLowerCase() && u.password === passwordVal);
+        if (!existing) {
+          errorEl.textContent = 'Invalid login.';
+          return;
+        }
+        user = existing;
+        isAdmin = false;
+        saveState();
+        renderAll();
+        switchMainTab(0);
+        return;
+      }
+
+      if (!usernameVal) {
+        errorEl.textContent = 'Please enter a username.';
+        return;
+      }
+
+      if (!passwordVal) {
+        errorEl.textContent = 'Please enter a password.';
+        return;
+      }
+
+      const missing = passwordRequirements(passwordVal);
+      if (missing.length) {
+        errorEl.textContent = 'Password is missing: ' + missing.join(', ');
+        return;
+      }
+
+      if (!confirmVal) {
+        errorEl.textContent = 'Please confirm your password.';
+        return;
+      }
+
+      if (passwordVal !== confirmVal) {
+        errorEl.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      if (users.some((u) => u.email.toLowerCase() === emailVal.toLowerCase())) {
+        errorEl.textContent = 'An account with that email already exists.';
+        return;
+      }
+
+      const newUser = { email: emailVal, password: passwordVal, username: usernameVal };
+      users.push(newUser);
+      user = newUser;
+      isAdmin = false;
       saveState();
-      closeAuthModal();
       renderAll();
-      if (isAdmin) openAdminModal();
-      alert(`Welcome, ${user.username}`);
+      switchMainTab(0);
     }
 
     function logout() {
@@ -574,67 +631,70 @@
       isAdmin = false;
       saveState();
       renderAll();
-      closeAdminModal();
+      closeAdminPanel();
     }
 
-    function openAdminModal() {
+    function openAdminPanel() {
       if (!isAdmin) {
         alert('Admin access only');
         return;
       }
-      const modal = document.getElementById('admin-modal');
-      modal.classList.remove('hidden');
-      renderAdmin();
+      document.getElementById('admin-modal').classList.remove('hidden');
+      renderAdminPanel();
     }
 
-    function closeAdminModal() {
+    function closeAdminPanel() {
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
     function setAdminTab(tabName) {
       currentAdminTab = tabName;
       ['home', 'site', 'boards', 'hardware', 'socials'].forEach((tab) => {
-        document.getElementById(`admin-${tab}-panel`).classList.toggle('hidden', tab !== tabName);
+        const panel = document.getElementById(`admin-${tab}-panel`);
         const btn = document.getElementById(`admin-tab-${tab}`);
-        if (!btn) return;
-        btn.classList.toggle('bg-white', tab === tabName);
-        btn.classList.toggle('text-black', tab === tabName);
-        btn.classList.toggle('bg-black', tab !== tabName);
-        btn.classList.toggle('text-white', tab !== tabName);
+        if (panel) panel.classList.toggle('hide', tab !== tabName);
+        if (btn) {
+          btn.classList.toggle('bg-white', tab === tabName);
+          btn.classList.toggle('text-black', tab === tabName);
+          btn.classList.toggle('bg-black', tab !== tabName);
+          btn.classList.toggle('text-white', tab !== tabName);
+        }
       });
+      renderAdminPanel();
     }
 
     function togglePreviewMode() {
       previewMode = !previewMode;
       saveState();
       renderPreviewBadge();
+      if (previewMode) renderAll();
     }
 
     function updateSiteField(field, value) {
       site[field] = value;
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function updateSocialField(field, value) {
       site.socials[field] = value;
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function updateHomePostsJson(value) {
       try {
         const parsed = JSON.parse(value);
-        if (Array.isArray(parsed)) {
-          site.homePosts = parsed;
-          saveState();
-          renderAll();
-          renderAdmin();
-        } else {
+        if (!Array.isArray(parsed)) {
           alert('Home posts must be a JSON array');
+          return;
         }
+        site.homePosts = parsed;
+        saveState();
+        renderAll();
+        renderAdminPanel();
       } catch {
         alert('Invalid JSON in home posts');
       }
@@ -647,7 +707,7 @@
       else boards[index][field] = value;
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function updateHardwareField(index, field, value) {
@@ -657,7 +717,7 @@
       else hardwareList[index][field] = value;
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function addBoard() {
@@ -671,7 +731,7 @@
       });
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function removeBoard(index) {
@@ -680,7 +740,7 @@
       if (selectedBoard && removed && selectedBoard.id === removed.id) selectedBoard = null;
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function addHardware() {
@@ -694,7 +754,7 @@
       });
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
     function removeHardware(index) {
@@ -703,10 +763,11 @@
       if (removed) selectedHardware = selectedHardware.filter((h) => h.id !== removed.id);
       saveState();
       renderAll();
-      renderAdmin();
+      renderAdminPanel();
     }
 
-    function renderAdmin() {
+    function renderAdminPanel() {
+      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
       setAdminTab(currentAdminTab);
 
       const homePanel = document.getElementById('admin-home-panel');
@@ -832,8 +893,6 @@
       <div><label class="field-label">TikTok</label><input class="panel-input" value="${escapeHtml(site.socials.tiktok)}" onchange="updateSocialField('tiktok', this.value)" /></div>
     </div>
   `;
-
-  document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
 }
 
 function getCurrentSetupTotal() {
@@ -858,9 +917,7 @@ function decrementStock(product) {
     return;
   }
   const hwMatch = hardwareList.find((h) => h.id === product.id);
-  if (hwMatch) {
-    hwMatch.stock = Math.max(0, Number(hwMatch.stock || 0) - 1);
-  }
+  if (hwMatch) hwMatch.stock = Math.max(0, Number(hwMatch.stock || 0) - 1);
 }
 
 function incrementStock(product) {
@@ -870,17 +927,11 @@ function incrementStock(product) {
     return;
   }
   const hwMatch = hardwareList.find((h) => h.id === product.id);
-  if (hwMatch) {
-    hwMatch.stock = Number(hwMatch.stock || 0) + 1;
-  }
+  if (hwMatch) hwMatch.stock = Number(hwMatch.stock || 0) + 1;
 }
 
 function openProductModal(type, index) {
-  selectedModalItem = {
-    type,
-    item: type === 'board' ? boards[index] : hardwareList[index]
-  };
-
+  selectedModalItem = { type, item: type === 'board' ? boards[index] : hardwareList[index] };
   const item = selectedModalItem.item;
   document.getElementById('modal-title').textContent = item.name;
   document.getElementById('modal-price').textContent = `$${Number(item.price).toFixed(2)}`;
@@ -917,9 +968,8 @@ function modalUseForSetup() {
     alert('Sold out');
     return;
   }
-  if (type === 'board') {
-    selectedBoard = item;
-  } else {
+  if (type === 'board') selectedBoard = item;
+  else {
     const exists = selectedHardware.findIndex((h) => h.id === item.id);
     if (exists >= 0) selectedHardware.splice(exists, 1);
     else selectedHardware.push(item);
@@ -1009,8 +1059,7 @@ function proceedCheckout() {
 
 function toggleCart() {
   const modal = document.getElementById('cart-modal');
-  const open = modal.classList.contains('hidden');
-  if (open) {
+  if (modal.classList.contains('hidden')) {
     renderCart();
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -1027,13 +1076,11 @@ function hideCart() {
 
 window.switchMainTab = switchMainTab;
 window.switchShopTab = switchShopTab;
-window.openAuthModal = openAuthModal;
-window.closeAuthModal = closeAuthModal;
 window.setAuthMode = setAuthMode;
 window.submitAuth = submitAuth;
 window.logout = logout;
-window.openAdminModal = openAdminModal;
-window.closeAdminModal = closeAdminModal;
+window.openAdminPanel = openAdminPanel;
+window.closeAdminPanel = closeAdminPanel;
 window.setAdminTab = setAdminTab;
 window.togglePreviewMode = togglePreviewMode;
 window.updateSiteField = updateSiteField;
@@ -1058,10 +1105,15 @@ window.hideCart = hideCart;
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeProductModal();
-    closeAuthModal();
     hideCart();
+    closeAuthPanelIfNeeded();
+    closeAdminPanel();
   }
 });
+
+function closeAuthPanelIfNeeded() {
+  // login is a full page tab now, so no modal to close
+}
 
 window.onload = () => {
   loadState();
@@ -1069,10 +1121,12 @@ window.onload = () => {
   setAuthMode('login');
   switchMainTab(0);
   switchShopTab(0);
+  renderAuthPage();
+  renderAuthState();
   if (isAdmin) {
-    document.getElementById('admin-open-btn').classList.remove('hidden');
-    document.getElementById('logout-btn').classList.remove('hidden');
-    document.getElementById('auth-btn').classList.add('hidden');
+    document.getElementById('admin-open-btn').classList.remove('hide');
+    document.getElementById('logout-btn').classList.remove('hide');
+    document.getElementById('auth-state-btn').classList.add('hide');
   }
 };
 
