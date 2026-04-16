@@ -1,200 +1,896 @@
 <!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zappa Skate | Boards • Hardware • Shred</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
-        body { font-family: 'Anton', sans-serif; }
-        .tab-active { border-bottom: 4px solid #000; }
-        .cart-circle { width: 52px; height: 52px; transition: 0.3s; }
-        @media (max-width: 768px) { .cart-circle { width: 42px; height: 42px; } }
-        .modal { backdrop-filter: blur(6px); }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zappa Skate | Boards • Hardware • Shred</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+    body { font-family: 'Anton', sans-serif; }
+    .tab-active { border-bottom: 4px solid #000; }
+    .subtab-active { border-bottom: 3px solid #000; }
+    .cart-circle {
+      width: 52px; height: 52px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .cart-circle:hover { transform: scale(1.08); }
+    @media (max-width: 768px) {
+      .cart-circle { width: 42px; height: 42px; }
+    }
+    .product-row {
+      transition: transform 0.18s ease, background-color 0.18s ease;
+    }
+    .product-row:hover { transform: translateY(-1px); }
+    .modal-backdrop { backdrop-filter: blur(6px); }
+    .soft-shadow { box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+    input, textarea, select {
+      border: 1px solid #000;
+      padding: 0.55rem 0.7rem;
+      width: 100%;
+      background: #fff;
+      color: #000;
+      font-family: inherit;
+    }
+    .mini-btn {
+      border: 1px solid #000;
+      padding: 0.35rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+    .mini-btn-dark {
+      border: 1px solid #fff;
+      padding: 0.35rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.95rem;
+      line-height: 1;
+      background: #000;
+      color: #fff;
+    }
+  </style>
 </head>
-<body class="bg-white text-black"><!-- ================= NAV ================= --><nav class="border-b border-black sticky top-0 bg-white z-50">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-center gap-12 text-2xl">
-        <button onclick="switchTab(0)" id="nav0" class="tab-active">HOME</button>
-        <button onclick="switchTab(1)" id="nav1">SHOP</button>
-        <button onclick="switchTab(2)" id="nav2">SOCIALS</button>
+<body class="bg-white text-black">  <!-- NAVBAR -->  <nav class="border-b border-black sticky top-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-center items-center gap-12 text-2xl">
+      <button onclick="switchTab(0)" id="nav-home" class="tab-active hover:text-gray-600">HOME</button>
+      <button onclick="switchTab(1)" id="nav-shop" class="hover:text-gray-600">SHOP</button>
+      <button onclick="switchTab(2)" id="nav-socials" class="hover:text-gray-600">SOCIALS</button>
     </div>
-</nav><!-- LOGIN BTN --><div class="absolute top-4 right-4">
-    <button onclick="openAuth()">LOGIN</button>
-</div><!-- ================= HOME ================= --><div id="home" class="max-w-6xl mx-auto px-6 py-12">
-    <h1 id="title" class="text-6xl text-center mb-10">ZAPPA SKATE</h1><h2 class="text-3xl mb-4">Latest Video</h2>
-<div class="aspect-video bg-black rounded-2xl overflow-hidden">
-    <iframe class="w-full h-full" src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
+  </nav>  <!-- AUTH BUTTON -->  <div class="absolute top-4 right-4 z-40">
+    <button id="auth-btn" onclick="openAuthModal()" class="mini-btn bg-white hover:bg-gray-100">LOGIN</button>
+  </div>  <!-- HOME -->  <div id="home-section" class="max-w-6xl mx-auto px-6 py-12">
+    <h1 id="site-title" class="text-6xl font-bold text-center mb-12">LATEST FROM ZAPPA SKATE</h1><div class="mb-16">
+  <h2 class="text-4xl mb-4">Latest YouTube Video</h2>
+  <div class="aspect-video bg-black rounded-2xl overflow-hidden soft-shadow">
+    <iframe id="youtube-embed" class="w-full h-full" src="https://www.youtube.com/embed/VIDEO_ID_HERE" title="Zappa Skate Latest" frameborder="0" allowfullscreen></iframe>
+  </div>
+  <p class="text-center mt-4 text-xl opacity-80">Replace VIDEO_ID_HERE with your latest upload • <span id="home-youtube-handle">@user</span></p>
 </div>
 
-</div><!-- ================= SHOP ================= --><div id="shop" class="hidden max-w-6xl mx-auto px-6 py-12"><div class="flex gap-8 border-b border-black mb-6">
-    <button onclick="shopTab(0)" id="sb0" class="tab-active text-3xl">BOARDS</button>
-    <button onclick="shopTab(1)" id="sb1" class="text-3xl">HARDWARE</button>
+<h2 class="text-4xl mb-8 text-center">Latest Posts Across Socials</h2>
+<div id="home-post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+
+  </div>  <!-- SHOP -->  <div id="shop-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
+    <h1 class="text-6xl font-bold text-center mb-8">SHOP</h1><div class="flex justify-start gap-8 mb-8 border-b border-black">
+  <button onclick="switchShopTab(0)" id="sub-boards" class="subtab-active text-3xl pb-2">BOARDS</button>
+  <button onclick="switchShopTab(1)" id="sub-hardware" class="text-3xl pb-2">HARDWARE</button>
 </div>
 
-<div id="boards"></div>
-<div id="hardware" class="hidden"></div>
-
-<!-- SETUP BAR -->
-<div class="bg-black text-white p-6 rounded-3xl mt-10">
-    <p>BOARD: <span id="selB">None</span></p>
-    <p>HARDWARE: <span id="selH">None</span></p>
-    <p>TOTAL: $<span id="total">0</span></p>
-    <button onclick="addToCart()" class="bg-white text-black px-4 py-2 mt-4">ADD TO CART</button>
-    <button onclick="checkout()" class="bg-white text-black px-4 py-2 mt-4">PAY (SOON)</button>
+<div id="setup-summary" class="bg-black text-white p-6 rounded-3xl mb-8 flex flex-wrap items-center justify-between gap-6 soft-shadow">
+  <div class="min-w-[240px]">
+    <span class="text-xl">SELECTED BOARD:</span>
+    <span id="selected-board-name" class="ml-4 font-bold text-2xl">— None yet —</span>
+  </div>
+  <div class="min-w-[240px]">
+    <span class="text-xl">HARDWARE:</span>
+    <span id="selected-hardware-list" class="ml-4 font-bold text-2xl">—</span>
+  </div>
+  <div class="text-right min-w-[180px]">
+    <span class="text-xl">TOTAL:</span>
+    <span id="setup-total" class="ml-4 font-bold text-4xl">$0.00</span>
+  </div>
+  <div class="flex gap-4 flex-wrap">
+    <button onclick="addToCartFromSelection()" class="bg-white text-black px-8 py-4 rounded-2xl font-bold text-xl hover:scale-105 transition-transform">ADD TO CART</button>
+    <button onclick="proceedCheckout()" class="bg-white text-black px-8 py-4 rounded-2xl font-bold text-xl hover:scale-105 transition-transform">PROCEED TO CHECKOUT</button>
+  </div>
 </div>
 
-</div><!-- ================= SOCIALS ================= --><div id="socials" class="hidden text-center p-10">
-    <p>YouTube: <span id="yt"></span></p>
-    <p>Instagram: <span id="ig"></span></p>
-    <p>Facebook: <span id="fb"></span></p>
-    <p>TikTok: <span id="tt"></span></p>
-</div><!-- ================= CART ================= --><button onclick="toggleCart()" class="fixed bottom-5 right-5 bg-black text-white w-14 h-14 rounded-full">🛒</button>
+<!-- BOARDS -->
+<div id="boards-content"></div>
 
-<div id="cart" class="hidden fixed right-0 top-0 w-80 h-full bg-white border-l border-black p-4">
-    <h2 class="text-3xl">CART</h2>
-    <div id="cartItems"></div>
-</div><!-- ================= AUTH ================= --><div id="auth" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center modal">
-    <div class="bg-white p-6 w-80">
-        <h2 class="text-2xl">LOGIN / SIGNUP</h2>
-        <input id="email" placeholder="email" class="border w-full p-2 mb-2">
-        <input id="password" placeholder="password" type="password" class="border w-full p-2 mb-2">
-        <input id="username" placeholder="username" class="border w-full p-2 mb-2">
-        <button onclick="auth()" class="bg-black text-white w-full py-2">ENTER</button>
+<!-- HARDWARE -->
+<div id="hardware-content" class="hidden"></div>
+
+  </div>  <!-- SOCIALS -->  <div id="socials-section" class="max-w-6xl mx-auto px-6 py-12 hidden">
+    <h1 class="text-6xl font-bold text-center mb-12">FOLLOW THE SHRED</h1>
+    <div id="social-links" class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"></div>
+  </div>  <!-- FLOATING CART -->  <button onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-black text-white rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110">
+    🛒
+    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
+  </button>  <!-- CART MODAL -->  <div id="cart-modal" class="hidden fixed inset-0 bg-black/70 modal-backdrop items-end md:items-center justify-center z-[9999]">
+    <div class="bg-white w-full max-w-2xl rounded-t-3xl md:rounded-3xl p-8 soft-shadow max-h-[92vh] overflow-auto">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-5xl font-bold">YOUR CART</h2>
+        <button onclick="hideCart()" class="text-4xl">✕</button>
+      </div>
+      <div id="cart-items" class="space-y-6"></div>
+      <div class="border-t border-black mt-8 pt-8 flex justify-between text-3xl flex-wrap gap-4">
+        <span>TOTAL (no shipping)</span>
+        <span id="cart-total" class="font-bold">$0.00</span>
+      </div>
+      <div class="flex gap-4 mt-8 flex-wrap">
+        <button onclick="hideCart()" class="flex-1 border-2 border-black py-6 text-2xl rounded-3xl">KEEP SHOPPING</button>
+        <button onclick="proceedCheckout()" class="flex-1 bg-black text-white py-6 text-2xl rounded-3xl">CHECKOUT</button>
+      </div>
     </div>
-</div><!-- ================= ADMIN ================= --><div id="admin" class="hidden fixed inset-0 bg-black text-white p-10 overflow-auto">
-    <h2 class="text-4xl">ADMIN PANEL</h2><h3>Site</h3>
-<input id="editTitle" class="text-black p-2 mb-2" placeholder="Title">
-<input id="editYT" class="text-black p-2 mb-2" placeholder="YouTube">
+  </div>  <!-- PRODUCT MODAL -->  <div id="product-modal" class="hidden fixed inset-0 bg-black/70 modal-backdrop items-center justify-center z-[10000] p-4">
+    <div class="bg-white text-black w-full max-w-xl rounded-3xl p-6 soft-shadow max-h-[92vh] overflow-auto">
+      <div class="flex justify-between items-start gap-4">
+        <div>
+          <h3 id="modal-title" class="text-4xl leading-tight">Product</h3>
+          <p id="modal-price" class="text-3xl mt-2">$0.00</p>
+        </div>
+        <button onclick="closeProductModal()" class="text-4xl leading-none">✕</button>
+      </div>
+      <div class="mt-5 flex gap-4 items-start flex-col md:flex-row">
+        <img id="modal-image" src="https://picsum.photos/600/600" alt="Product" class="w-full md:w-44 aspect-square object-cover rounded-2xl border border-black" />
+        <div class="flex-1">
+          <p id="modal-desc" class="text-xl mb-6">Description</p>
+          <div class="flex gap-3 flex-wrap">
+            <button onclick="modalAddToCart()" class="bg-black text-white px-6 py-3 rounded-2xl text-xl">ADD TO CART</button>
+            <button onclick="proceedCheckout()" class="border border-black px-6 py-3 rounded-2xl text-xl">PAY NOW</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  <!-- AUTH MODAL -->  <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 modal-backdrop flex items-center justify-center z-[10001] p-4">
+    <div class="bg-white text-black p-6 w-full max-w-md rounded-3xl soft-shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="auth-title" class="text-3xl">LOGIN</h2>
+        <button onclick="closeAuthModal()" class="text-3xl leading-none">✕</button>
+      </div>
+      <div class="flex gap-3 mb-4">
+        <button id="login-tab-btn" onclick="setAuthMode('login')" class="mini-btn bg-black text-white">LOGIN</button>
+        <button id="signup-tab-btn" onclick="setAuthMode('signup')" class="mini-btn">SIGN UP</button>
+      </div>
+      <label class="block text-lg mb-1">Email</label>
+      <input id="auth-email" type="email" placeholder="email@example.com" class="mb-3" />
+      <label class="block text-lg mb-1">Password</label>
+      <input id="auth-password" type="password" placeholder="password" class="mb-3" />
+      <div id="username-wrap" class="hidden">
+        <label class="block text-lg mb-1">Username</label>
+        <input id="auth-username" type="text" placeholder="username" class="mb-3" />
+      </div>
+      <button onclick="submitAuth()" class="bg-black text-white w-full py-3 rounded-2xl text-2xl">ENTER</button>
+      <p class="text-sm mt-3 opacity-70">Admin username: <span class="font-bold">zappa.admin</span></p>
+    </div>
+  </div>  <!-- ADMIN -->  <div id="admin-modal" class="hidden fixed inset-0 bg-black text-white z-[10002] p-4 md:p-10 overflow-auto">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-between items-center gap-4 flex-wrap mb-8">
+        <h2 class="text-5xl">ADMIN PANEL</h2>
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="togglePreviewMode()" class="mini-btn-dark">PREVIEW MODE: <span id="preview-state">OFF</span></button>
+          <button onclick="saveAdmin()" class="mini-btn-dark">SAVE</button>
+          <button onclick="closeAdminModal()" class="mini-btn-dark">EXIT</button>
+        </div>
+      </div><div class="flex gap-3 flex-wrap mb-6">
+    <button onclick="setAdminTab('site')" id="admin-tab-site" class="mini-btn-dark">SITE</button>
+    <button onclick="setAdminTab('boards')" id="admin-tab-boards" class="mini-btn-dark">BOARDS</button>
+    <button onclick="setAdminTab('hardware')" id="admin-tab-hardware" class="mini-btn-dark">HARDWARE</button>
+    <button onclick="setAdminTab('socials')" id="admin-tab-socials" class="mini-btn-dark">SOCIALS</button>
+  </div>
 
-<h3>Socials</h3>
-<input id="editIG" class="text-black p-2 mb-2" placeholder="Instagram">
-<input id="editFB" class="text-black p-2 mb-2" placeholder="Facebook">
-<input id="editTT" class="text-black p-2 mb-2" placeholder="TikTok">
+  <div id="admin-site-panel" class="space-y-4"></div>
+  <div id="admin-boards-panel" class="hidden space-y-4"></div>
+  <div id="admin-hardware-panel" class="hidden space-y-4"></div>
+  <div id="admin-socials-panel" class="hidden space-y-4"></div>
+</div>
 
-<h3>Boards</h3>
-<div id="aBoards"></div>
+  </div>  <footer class="bg-black text-white py-8 text-center mt-12">
+    <p id="footer-text" class="text-xl">website made by zappa • business owned by Aiden Young</p>
+  </footer>  <script>
+    // ---------------------------
+    // State
+    // ---------------------------
+    const STORAGE_KEY = 'zappa_skate_store_v3';
 
-<h3>Hardware</h3>
-<div id="aHardware"></div>
+    let currentTab = 0;
+    let currentShopTab = 0;
+    let currentAuthMode = 'login';
+    let currentAdminTab = 'site';
+    let previewMode = false;
 
-<button onclick="saveAdmin()" class="bg-white text-black px-4 py-2 mt-4">SAVE</button>
-<button onclick="previewAdmin()" class="bg-white text-black px-4 py-2 mt-4">PREVIEW</button>
+    let selectedBoard = null;
+    let selectedHardware = [];
+    let selectedModalItem = null;
 
-</div><script>
+    let user = null;
+    let isAdmin = false;
 
-let user=null;
-let admin=false;
-let cart=[];
-let boardSel=null;
-let hardwareSel=[];
+    let cart = [];
 
-let site={title:"ZAPPA SKATE",yt:"user",ig:"user",fb:"user",tt:"user"};
+    let site = {
+      title: 'LATEST FROM ZAPPA SKATE',
+      footer: 'website made by zappa • business owned by Aiden Young',
+      youtubeHandle: '@user',
+      youtubeVideoId: 'VIDEO_ID_HERE',
+      socials: {
+        youtube: 'user',
+        instagram: 'user',
+        facebook: 'user',
+        tiktok: 'user'
+      },
+      homePosts: [
+        { platform: 'Instagram', handle: '@user', text: 'Just sent this new flame deck into orbit 🔥 #ZappaSkate', image: 'https://picsum.photos/id/1015/600/600' },
+        { platform: 'Facebook', handle: 'user', text: 'Park session was pure fire today. Who’s hitting the ramps tomorrow?', image: 'https://picsum.photos/id/160/600/600' },
+        { platform: 'TikTok', handle: '@user', text: '3 tricks in 10 seconds. New hardware dropped. Link in bio.', image: 'https://picsum.photos/id/201/600/600' },
+        { platform: 'Instagram', handle: '@user', text: 'Street shredding with the crew. New board drop tomorrow.', image: 'https://picsum.photos/id/29/600/600' }
+      ]
+    };
 
-let users=JSON.parse(localStorage.getItem("users")||"[]");
+    let boards = [
+      { id: 0, name: 'Zappa Flame Pro', price: 59.99, img: 'https://picsum.photos/id/1015/600/600', desc: '7.75" • Maple • Flames graphic' },
+      { id: 1, name: 'Shred City Cruiser', price: 49.99, img: 'https://picsum.photos/id/160/600/600', desc: '8.0" • Street shape • Abstract waves' },
+      { id: 2, name: 'Park Vert Legend', price: 69.99, img: 'https://picsum.photos/id/201/600/600', desc: '8.25" • Vert shape • Retro skull' },
+      { id: 3, name: 'Street Skull Shredder', price: 54.99, img: 'https://picsum.photos/id/29/600/600', desc: '7.75" • Street shape • Black skull' }
+    ];
 
-let boards=[
- {name:"Flame Deck",price:60,img:"https://picsum.photos/300"},
- {name:"Skull Deck",price:55,img:"https://picsum.photos/301"}
-];
+    let hardwareList = [
+      { id: 0, name: 'Independent Trucks (pair)', price: 39.99, img: 'https://picsum.photos/id/41/600/600', desc: 'Strong and smooth truck setup.' },
+      { id: 1, name: 'Thunder Alloy Trucks', price: 34.99, img: 'https://picsum.photos/id/42/600/600', desc: 'Lightweight street-ready trucks.' },
+      { id: 2, name: 'Spitfire Formula Four Wheels (set)', price: 29.99, img: 'https://picsum.photos/id/43/600/600', desc: 'Fast wheels with grip and control.' },
+      { id: 3, name: 'Bones Reds Bearings', price: 14.99, img: 'https://picsum.photos/id/44/600/600', desc: 'Smooth rolling bearings for speed.' },
+      { id: 4, name: 'Riser Pads (set of 2)', price: 8.99, img: 'https://picsum.photos/id/45/600/600', desc: 'Keeps wheelbite down.' },
+      { id: 5, name: 'Grip Tape Sheet', price: 12.99, img: 'https://picsum.photos/id/46/600/600', desc: 'Sticky grip for board control.' }
+    ];
 
-let hardware=[
- {name:"Trucks",price:30,img:""},
- {name:"Wheels",price:25,img:""}
-];
+    let users = [];
 
-function switchTab(t){
- document.getElementById("home").classList.add("hidden");
- document.getElementById("shop").classList.add("hidden");
- document.getElementById("socials").classList.add("hidden");
- if(t==0)document.getElementById("home").classList.remove("hidden");
- if(t==1)document.getElementById("shop").classList.remove("hidden");
- if(t==2)document.getElementById("socials").classList.remove("hidden");
+    // ---------------------------
+    // Storage
+    // ---------------------------
+    function saveState() {
+      const data = {
+        users,
+        user,
+        isAdmin,
+        cart,
+        site,
+        boards,
+        hardwareList,
+        previewMode
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        users = Array.isArray(data.users) ? data.users : users;
+        user = data.user ?? user;
+        isAdmin = !!data.isAdmin;
+        cart = Array.isArray(data.cart) ? data.cart : cart;
+        site = data.site ?? site;
+        boards = Array.isArray(data.boards) ? data.boards : boards;
+        hardwareList = Array.isArray(data.hardwareList) ? data.hardwareList : hardwareList;
+        previewMode = !!data.previewMode;
+      } catch (e) {
+        console.error('Failed to load saved data', e);
+      }
+    }
+
+    // ---------------------------
+    // Tabs
+    // ---------------------------
+    function switchTab(n) {
+      currentTab = n;
+      document.getElementById('home-section').classList.add('hidden');
+      document.getElementById('shop-section').classList.add('hidden');
+      document.getElementById('socials-section').classList.add('hidden');
+      document.getElementById('home-section').classList.toggle('hidden', n !== 0);
+      document.getElementById('shop-section').classList.toggle('hidden', n !== 1);
+      document.getElementById('socials-section').classList.toggle('hidden', n !== 2);
+
+      document.getElementById('nav-home').classList.toggle('tab-active', n === 0);
+      document.getElementById('nav-shop').classList.toggle('tab-active', n === 1);
+      document.getElementById('nav-socials').classList.toggle('tab-active', n === 2);
+    }
+
+    function switchShopTab(n) {
+      currentShopTab = n;
+      document.getElementById('boards-content').classList.toggle('hidden', n !== 0);
+      document.getElementById('hardware-content').classList.toggle('hidden', n !== 1);
+      document.getElementById('sub-boards').classList.toggle('subtab-active', n === 0);
+      document.getElementById('sub-hardware').classList.toggle('subtab-active', n === 1);
+    }
+
+    // ---------------------------
+    // Render Home / Socials / Shop
+    // ---------------------------
+    function renderHome() {
+      document.getElementById('site-title').textContent = site.title;
+      document.getElementById('youtube-embed').src = `https://www.youtube.com/embed/${site.youtubeVideoId}`;
+      document.getElementById('home-youtube-handle').textContent = site.youtubeHandle;
+      document.getElementById('footer-text').textContent = site.footer;
+
+      const grid = document.getElementById('home-post-grid');
+      grid.innerHTML = '';
+      site.homePosts.forEach((post) => {
+        const card = document.createElement('div');
+        card.className = 'border border-black rounded-3xl overflow-hidden soft-shadow bg-white';
+        card.innerHTML = `
+          <img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.platform)}" class="w-full aspect-square object-cover" />
+          <div class="p-4">
+            <p class="font-bold">${escapeHtml(post.platform)} • ${escapeHtml(post.handle)}</p>
+            <p class="text-sm">${escapeHtml(post.text)}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderSocials() {
+      document.getElementById('yt').textContent = site.socials.youtube;
+      document.getElementById('ig').textContent = site.socials.instagram;
+      document.getElementById('fb').textContent = site.socials.facebook;
+      document.getElementById('tt').textContent = site.socials.tiktok;
+
+      const socialLinks = document.getElementById('social-links');
+      socialLinks.innerHTML = `
+        <a href="https://youtube.com/@${encodeURIComponent(site.socials.youtube)}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">📺<br><span class="mt-4">YouTube • ${escapeHtml(site.socials.youtube)}</span></a>
+        <a href="https://instagram.com/${encodeURIComponent(site.socials.instagram.replace('@', ''))}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">📸<br><span class="mt-4">Instagram • ${escapeHtml(site.socials.instagram)}</span></a>
+        <a href="https://facebook.com/${encodeURIComponent(site.socials.facebook)}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">👍<br><span class="mt-4">Facebook • ${escapeHtml(site.socials.facebook)}</span></a>
+        <a href="https://tiktok.com/@${encodeURIComponent(site.socials.tiktok.replace('@', ''))}" target="_blank" class="border-2 border-black rounded-3xl py-12 hover:bg-black hover:text-white text-4xl flex flex-col items-center">🎵<br><span class="mt-4">TikTok • ${escapeHtml(site.socials.tiktok)}</span></a>
+      `;
+    }
+
+    function renderBoards() {
+      const wrap = document.getElementById('boards-content');
+      wrap.innerHTML = '';
+      boards.forEach((board, index) => {
+        const row = document.createElement('div');
+        row.className = 'product-row cursor-pointer border border-black rounded-3xl overflow-hidden mb-6 bg-white';
+        row.onclick = () => openProductModal('board', index);
+        row.innerHTML = `
+          <div class="flex items-center gap-4 p-3 md:p-4">
+            <img src="${escapeHtml(board.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-black flex-none" alt="${escapeHtml(board.name)}" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-2xl md:text-3xl truncate">${escapeHtml(board.name)}</h3>
+                <p class="text-2xl md:text-3xl whitespace-nowrap">$${board.price.toFixed(2)}</p>
+              </div>
+              <p class="text-sm md:text-base opacity-80 mt-1">${escapeHtml(board.desc || '')}</p>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(row);
+      });
+    }
+
+    function renderHardware() {
+      const wrap = document.getElementById('hardware-content');
+      wrap.innerHTML = '';
+      hardwareList.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'product-row cursor-pointer border border-black rounded-3xl overflow-hidden mb-6 bg-white';
+        row.onclick = () => openProductModal('hardware', index);
+        row.innerHTML = `
+          <div class="flex items-center gap-4 p-3 md:p-4">
+            <img src="${escapeHtml(item.img)}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border border-black flex-none" alt="${escapeHtml(item.name)}" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-2xl md:text-3xl truncate">${escapeHtml(item.name)}</h3>
+                <p class="text-2xl md:text-3xl whitespace-nowrap">$${item.price.toFixed(2)}</p>
+              </div>
+              <p class="text-sm md:text-base opacity-80 mt-1">${escapeHtml(item.desc || '')}</p>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(row);
+      });
+    }
+
+    function renderSetupSummary() {
+      const boardLabel = document.getElementById('selected-board-name');
+      const hardwareLabel = document.getElementById('selected-hardware-list');
+      const totalLabel = document.getElementById('setup-total');
+
+      if (selectedBoard) {
+        boardLabel.textContent = `${selectedBoard.name} ($${selectedBoard.price.toFixed(2)})`;
+      } else {
+        boardLabel.textContent = '— None yet —';
+      }
+
+      if (selectedHardware.length) {
+        hardwareLabel.textContent = selectedHardware.map((h) => h.name).join(' + ');
+      } else {
+        hardwareLabel.textContent = '—';
+      }
+
+      totalLabel.textContent = `$${getCurrentSetupTotal().toFixed(2)}`;
+    }
+
+    function renderCartCount() {
+      document.getElementById('cart-count').textContent = String(cart.length);
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items');
+      const total = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+      document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+      container.innerHTML = '';
+
+      if (!cart.length) {
+        container.innerHTML = `<p class="text-center text-2xl py-12">Cart empty — go build a setup.</p>`;
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'flex justify-between items-start border-b border-black pb-6 gap-4';
+        el.innerHTML = `
+          <div class="min-w-0">
+            <p class="text-2xl truncate">${escapeHtml(item.boardName || item.name || 'Item')}</p>
+            <p class="text-sm">${escapeHtml(item.hardwareNames?.join(' • ') || '')}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-3xl font-bold">$${item.totalPrice.toFixed(2)}</p>
+            <button onclick="removeFromCart(${index})" class="text-red-500 text-xl mt-2">REMOVE</button>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    // ---------------------------
+    // Selection / Modal
+    // ---------------------------
+    function selectBoard(index) {
+      selectedBoard = boards[index];
+      selectedHardware = [];
+      renderSetupSummary();
+      switchShopTab(1);
+    }
+
+    function toggleHardware(index) {
+      const item = hardwareList[index];
+      const found = selectedHardware.findIndex((x) => x.id === item.id);
+      if (found >= 0) selectedHardware.splice(found, 1);
+      else selectedHardware.push(item);
+      renderSetupSummary();
+    }
+
+    function getCurrentSetupTotal() {
+      const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
+      const boardTotal = selectedBoard ? Number(selectedBoard.price || 0) : 0;
+      return boardTotal + hardwareTotal;
+    }
+
+    function openProductModal(type, index) {
+      selectedModalItem = type === 'board' ? boards[index] : hardwareList[index];
+      const modal = document.getElementById('product-modal');
+      document.getElementById('modal-title').textContent = selectedModalItem.name;
+      document.getElementById('modal-price').textContent = `$${Number(selectedModalItem.price).toFixed(2)}`;
+      document.getElementById('modal-image').src = selectedModalItem.img;
+      document.getElementById('modal-desc').textContent = selectedModalItem.desc || '';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeProductModal() {
+      const modal = document.getElementById('product-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      selectedModalItem = null;
+    }
+
+    function modalAddToCart() {
+      if (!selectedModalItem) return;
+      if (boards.some((b) => b.id === selectedModalItem.id)) {
+        cart.push({
+          type: 'board',
+          boardName: selectedModalItem.name,
+          hardwareNames: [],
+          totalPrice: Number(selectedModalItem.price),
+          image: selectedModalItem.img
+        });
+      } else {
+        cart.push({
+          type: 'hardware',
+          boardName: selectedModalItem.name,
+          hardwareNames: [],
+          totalPrice: Number(selectedModalItem.price),
+          image: selectedModalItem.img
+        });
+      }
+      renderCartCount();
+      renderCart();
+      saveState();
+      closeProductModal();
+      alert('Added to cart');
+    }
+
+    function addToCartFromSelection() {
+      if (!selectedBoard) {
+        alert('Please select a board first');
+        return;
+      }
+      const hardwareTotal = selectedHardware.reduce((sum, item) => sum + Number(item.price || 0), 0);
+      const totalPrice = Number(selectedBoard.price || 0) + hardwareTotal;
+      cart.push({
+        type: 'setup',
+        boardName: selectedBoard.name,
+        hardwareNames: selectedHardware.map((h) => h.name),
+        totalPrice,
+        image: selectedBoard.img
+      });
+      renderCartCount();
+      renderCart();
+      saveState();
+      selectedBoard = null;
+      selectedHardware = [];
+      renderSetupSummary();
+      alert('Added to cart');
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      renderCartCount();
+      renderCart();
+      saveState();
+    }
+
+    // ---------------------------
+    // Checkout
+    // ---------------------------
+    function proceedCheckout() {
+      alert('Payment soon - we have not released product yet. Be ready though.');
+    }
+
+    // ---------------------------
+    // Cart modal
+    // ---------------------------
+    function toggleCart() {
+      const modal = document.getElementById('cart-modal');
+      const open = modal.classList.contains('hidden');
+      if (open) {
+        renderCart();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        hideCart();
+      }
+    }
+
+    function hideCart() {
+      const modal = document.getElementById('cart-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // ---------------------------
+    // Auth
+    // ---------------------------
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('auth-modal').classList.add('flex');
+      setAuthMode('login');
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      document.getElementById('auth-title').textContent = mode === 'login' ? 'LOGIN' : 'SIGN UP';
+      document.getElementById('login-tab-btn').classList.toggle('bg-black', mode === 'login');
+      document.getElementById('login-tab-btn').classList.toggle('text-white', mode === 'login');
+      document.getElementById('signup-tab-btn').classList.toggle('bg-black', mode === 'signup');
+      document.getElementById('signup-tab-btn').classList.toggle('text-white', mode === 'signup');
+      document.getElementById('username-wrap').classList.toggle('hidden', mode === 'login');
+    }
+
+    function submitAuth() {
+      const emailVal = document.getElementById('auth-email').value.trim();
+      const passVal = document.getElementById('auth-password').value.trim();
+      const usernameVal = document.getElementById('auth-username').value.trim();
+
+      if (!emailVal || !passVal) {
+        alert('Please enter email and password');
+        return;
+      }
+
+      if (currentAuthMode === 'signup') {
+        if (!usernameVal) {
+          alert('Please enter a username');
+          return;
+        }
+        if (users.some((u) => u.email.toLowerCase() === emailVal.toLowerCase())) {
+          alert('An account with that email already exists');
+          return;
+        }
+        const newUser = { email: emailVal, password: passVal, username: usernameVal };
+        users.push(newUser);
+        user = newUser;
+      } else {
+        const found = users.find((u) => u.email.toLowerCase() === emailVal.toLowerCase() && u.password === passVal);
+        if (!found) {
+          alert('Invalid login');
+          return;
+        }
+        user = found;
+      }
+
+      isAdmin = user.username === 'zappa.admin';
+      saveState();
+      closeAuthModal();
+      updateAuthButton();
+      if (isAdmin) openAdminModal();
+      alert(`Welcome, ${user.username}`);
+    }
+
+    function updateAuthButton() {
+      const btn = document.getElementById('auth-btn');
+      if (!user) {
+        btn.textContent = 'LOGIN';
+      } else {
+        btn.textContent = user.username.toUpperCase();
+      }
+    }
+
+    function logout() {
+      user = null;
+      isAdmin = false;
+      saveState();
+      updateAuthButton();
+    }
+
+    // ---------------------------
+    // Admin
+    // ---------------------------
+    function openAdminModal() {
+      const modal = document.getElementById('admin-modal');
+      modal.classList.remove('hidden');
+      renderAdmin();
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function setAdminTab(tab) {
+      currentAdminTab = tab;
+      const tabs = ['site', 'boards', 'hardware', 'socials'];
+      tabs.forEach((t) => {
+        document.getElementById(`admin-${t}-panel`).classList.toggle('hidden', t !== tab);
+        document.getElementById(`admin-tab-${t}`).classList.toggle('bg-white', t === tab);
+        document.getElementById(`admin-tab-${t}`).classList.toggle('text-black', t === tab);
+        document.getElementById(`admin-tab-${t}`).classList.toggle('bg-black', t !== tab);
+        document.getElementById(`admin-tab-${t}`).classList.toggle('text-white', t !== tab);
+      });
+    }
+
+    function togglePreviewMode() {
+      previewMode = !previewMode;
+      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
+      if (previewMode) {
+        applyPreviewToLiveUI();
+      } else {
+        renderAll();
+      }
+      saveState();
+    }
+
+    function renderAdmin() {
+      document.getElementById('preview-state').textContent = previewMode ? 'ON' : 'OFF';
+      setAdminTab(currentAdminTab);
+
+      document.getElementById('editTitle').value = site.title;
+      document.getElementById('editYT').value = site.youtubeHandle;
+      document.getElementById('editIG').value = site.socials.instagram;
+      document.getElementById('editFB').value = site.socials.facebook;
+      document.getElementById('editTT').value = site.socials.tiktok;
+
+      const sitePanel = document.getElementById('admin-site-panel');
+      sitePanel.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1 text-xl">Site Title</label>
+            <input id="admin-site-title" value="${escapeHtml(site.title)}" />
+          </div>
+          <div>
+            <label class="block mb-1 text-xl">Footer Text</label>
+            <input id="admin-footer" value="${escapeHtml(site.footer)}" />
+          </div>
+          <div>
+            <label class="block mb-1 text-xl">YouTube Handle</label>
+            <input id="admin-yt-handle" value="${escapeHtml(site.youtubeHandle)}" />
+          </div>
+          <div>
+            <label class="block mb-1 text-xl">YouTube Video ID</label>
+            <input id="admin-yt-video" value="${escapeHtml(site.youtubeVideoId)}" />
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block mb-1 text-xl">Home Posts (JSON)</label>
+          <textarea id="admin-home-posts" rows="10">${escapeHtml(JSON.stringify(site.homePosts, null, 2))}</textarea></div>
+  `;
+
+  const boardsPanel = document.getElementById('admin-boards-panel');
+  boardsPanel.innerHTML = boards.map((b, i) => `
+    <div class="border border-white p-4 rounded-2xl">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div><label class="block mb-1 text-xl">Name</label><input id="board-name-${i}" value="${escapeHtml(b.name)}" /></div>
+        <div><label class="block mb-1 text-xl">Price</label><input id="board-price-${i}" type="number" step="0.01" value="${Number(b.price)}" /></div>
+        <div><label class="block mb-1 text-xl">Image URL</label><input id="board-img-${i}" value="${escapeHtml(b.img)}" /></div>
+        <div><label class="block mb-1 text-xl">Description</label><input id="board-desc-${i}" value="${escapeHtml(b.desc || '')}" /></div>
+      </div>
+      <div class="mt-3 flex gap-2 flex-wrap">
+        <button class="mini-btn-dark" onclick="removeBoard(${i})">REMOVE</button>
+      </div>
+    </div>
+  `).join('') + `
+    <button class="mini-btn-dark" onclick="addBoard()">+ ADD BOARD</button>
+  `;
+
+  const hwPanel = document.getElementById('admin-hardware-panel');
+  hwPanel.innerHTML = hardwareList.map((h, i) => `
+    <div class="border border-white p-4 rounded-2xl">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div><label class="block mb-1 text-xl">Name</label><input id="hw-name-${i}" value="${escapeHtml(h.name)}" /></div>
+        <div><label class="block mb-1 text-xl">Price</label><input id="hw-price-${i}" type="number" step="0.01" value="${Number(h.price)}" /></div>
+        <div><label class="block mb-1 text-xl">Image URL</label><input id="hw-img-${i}" value="${escapeHtml(h.img)}" /></div>
+        <div><label class="block mb-1 text-xl">Description</label><input id="hw-desc-${i}" value="${escapeHtml(h.desc || '')}" /></div>
+      </div>
+      <div class="mt-3 flex gap-2 flex-wrap">
+        <button class="mini-btn-dark" onclick="removeHardware(${i})">REMOVE</button>
+      </div>
+    </div>
+  `).join('') + `
+    <button class="mini-btn-dark" onclick="addHardware()">+ ADD HARDWARE</button>
+  `;
+
+  const socialsPanel = document.getElementById('admin-socials-panel');
+  socialsPanel.innerHTML = `
+    <div class="grid md:grid-cols-2 gap-4">
+      <div><label class="block mb-1 text-xl">YouTube</label><input id="admin-social-youtube" value="${escapeHtml(site.socials.youtube)}" /></div>
+      <div><label class="block mb-1 text-xl">Instagram</label><input id="admin-social-instagram" value="${escapeHtml(site.socials.instagram)}" /></div>
+      <div><label class="block mb-1 text-xl">Facebook</label><input id="admin-social-facebook" value="${escapeHtml(site.socials.facebook)}" /></div>
+      <div><label class="block mb-1 text-xl">TikTok</label><input id="admin-social-tiktok" value="${escapeHtml(site.socials.tiktok)}" /></div>
+    </div>
+  `;
+
+  setAdminTab(currentAdminTab);
 }
 
-function shopTab(t){
- document.getElementById("boards").classList.toggle("hidden",t!==0);
- document.getElementById("hardware").classList.toggle("hidden",t!==1);
+function addBoard() {
+  boards.push({
+    id: Date.now(),
+    name: 'New Board',
+    price: 50,
+    img: 'https://picsum.photos/600/600',
+    desc: 'New board description'
+  });
+  renderAdmin();
+  saveState();
 }
 
-function render(){
- let b=document.getElementById("boards");
- b.innerHTML="";
- boards.forEach((x,i)=>{
-  b.innerHTML+=`<div onclick=selB(${i}) class='border p-2 mb-2'>${x.name} $${x.price}</div>`;
- });
-
- let h=document.getElementById("hardware");
- h.innerHTML="";
- hardware.forEach((x,i)=>{
-  h.innerHTML+=`<div onclick=selH(${i}) class='border p-2 mb-2'>${x.name} $${x.price}</div>`;
- });
+function removeBoard(index) {
+  boards.splice(index, 1);
+  renderAdmin();
+  saveState();
 }
 
-function selB(i){boardSel=boards[i];update();}
-function selH(i){hardwareSel.push(hardware[i]);update();}
-
-function update(){
- document.getElementById("selB").innerText=boardSel?boardSel.name:"None";
- document.getElementById("selH").innerText=hardwareSel.map(h=>h.name).join(",")||"None";
- let t=(boardSel?boardSel.price:0)+hardwareSel.reduce((a,b)=>a+b.price,0);
- document.getElementById("total").innerText=t;
+function addHardware() {
+  hardwareList.push({
+    id: Date.now(),
+    name: 'New Hardware',
+    price: 25,
+    img: 'https://picsum.photos/600/600',
+    desc: 'New hardware description'
+  });
+  renderAdmin();
+  saveState();
 }
 
-function addToCart(){cart.push({boardSel,hardwareSel});alert("added");}
-function checkout(){alert("Payment soon");}
-
-function toggleCart(){document.getElementById("cart").classList.toggle("hidden");}
-
-function openAuth(){document.getElementById("auth").classList.remove("hidden");}
-
-function auth(){
- let u={email:email.value,pass:password.value,name:username.value};
- users.push(u);
- localStorage.setItem("users",JSON.stringify(users));
- user=u;
- if(u.name=="zappa.admin"){admin=true;openAdmin();}
- document.getElementById("auth").classList.add("hidden");
+function removeHardware(index) {
+  hardwareList.splice(index, 1);
+  renderAdmin();
+  saveState();
 }
 
-function openAdmin(){document.getElementById("admin").classList.remove("hidden");loadAdmin();}
+function saveAdmin() {
+  site.title = document.getElementById('admin-site-title').value.trim() || site.title;
+  site.footer = document.getElementById('admin-footer').value.trim() || site.footer;
+  site.youtubeHandle = document.getElementById('admin-yt-handle').value.trim() || site.youtubeHandle;
+  site.youtubeVideoId = document.getElementById('admin-yt-video').value.trim() || site.youtubeVideoId;
+  site.socials.youtube = document.getElementById('admin-social-youtube').value.trim() || site.socials.youtube;
+  site.socials.instagram = document.getElementById('admin-social-instagram').value.trim() || site.socials.instagram;
+  site.socials.facebook = document.getElementById('admin-social-facebook').value.trim() || site.socials.facebook;
+  site.socials.tiktok = document.getElementById('admin-social-tiktok').value.trim() || site.socials.tiktok;
 
-function loadAdmin(){
- document.getElementById("editTitle").value=site.title;
- document.getElementById("editYT").value=site.yt;
- document.getElementById("editIG").value=site.ig;
- document.getElementById("editFB").value=site.fb;
- document.getElementById("editTT").value=site.tt;
+  const postsText = document.getElementById('admin-home-posts').value.trim();
+  try {
+    const parsedPosts = JSON.parse(postsText);
+    if (Array.isArray(parsedPosts)) site.homePosts = parsedPosts;
+  } catch {
+    alert('Home posts JSON is invalid. Your other changes were still saved.');
+  }
 
- let aB=document.getElementById("aBoards");aB.innerHTML="";
- boards.forEach((b,i)=>{
-  aB.innerHTML+=`<input value='${b.name}' onchange='boards[${i}].name=this.value'><input value='${b.price}' onchange='boards[${i}].price=+this.value'><input value='${b.img}' onchange='boards[${i}].img=this.value'><br>`;
- });
+  boards.forEach((b, i) => {
+    b.name = document.getElementById(`board-name-${i}`).value.trim() || b.name;
+    b.price = parseFloat(document.getElementById(`board-price-${i}`).value) || 0;
+    b.img = document.getElementById(`board-img-${i}`).value.trim() || b.img;
+    b.desc = document.getElementById(`board-desc-${i}`).value.trim() || '';
+  });
 
- let aH=document.getElementById("aHardware");aH.innerHTML="";
- hardware.forEach((h,i)=>{
-  aH.innerHTML+=`<input value='${h.name}' onchange='hardware[${i}].name=this.value'><input value='${h.price}' onchange='hardware[${i}].price=+this.value'><input value='${h.img}' onchange='hardware[${i}].img=this.value'><br>`;
- });
+  hardwareList.forEach((h, i) => {
+    h.name = document.getElementById(`hw-name-${i}`).value.trim() || h.name;
+    h.price = parseFloat(document.getElementById(`hw-price-${i}`).value) || 0;
+    h.img = document.getElementById(`hw-img-${i}`).value.trim() || h.img;
+    h.desc = document.getElementById(`hw-desc-${i}`).value.trim() || '';
+  });
+
+  renderAll();
+  saveState();
+  alert('Saved');
 }
 
-function saveAdmin(){
- site.title=editTitle.value;
- site.yt=editYT.value;
- site.ig=editIG.value;
- site.fb=editFB.value;
- site.tt=editTT.value;
-
- document.getElementById("title").innerText=site.title;
- document.getElementById("yt").innerText=site.yt;
- document.getElementById("ig").innerText=site.ig;
- document.getElementById("fb").innerText=site.fb;
- document.getElementById("tt").innerText=site.tt;
-
- document.getElementById("admin").classList.add("hidden");
+function previewAdmin() {
+  applyPreviewToLiveUI();
+  alert('Preview applied');
 }
 
-function previewAdmin(){alert("preview mode (live already)");}
+function applyPreviewToLiveUI() {
+  renderAll();
+}
 
-render();
-</script></body>
+// ---------------------------
+// Helpers
+// ---------------------------
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+// ---------------------------
+// Initial render
+// ---------------------------
+function renderAll() {
+  renderHome();
+  renderSocials();
+  renderBoards();
+  renderHardware();
+  renderSetupSummary();
+  renderCartCount();
+  renderCart();
+  updateAuthButton();
+  document.getElementById('footer-text').textContent = site.footer;
+  if (previewMode) document.getElementById('preview-state').textContent = 'ON';
+}
+
+// ---------------------------
+// Boot
+// ---------------------------
+window.onload = () => {
+  loadState();
+  renderAll();
+  switchTab(0);
+  switchShopTab(0);
+  setAuthMode('login');
+  if (isAdmin) {
+    openAdminModal();
+  }
+};
+
+  </script>
+</body>
 </html>
