@@ -65,7 +65,7 @@
     <button id="admin-open-btn" onclick="openAdminPanel()" class="btn-white hide">ADMIN</button>
     <button id="logout-btn" onclick="logout()" class="btn-white hide">LOGOUT</button>
   </div>  <!-- HOME -->  <section id="home-section" class="max-w-6xl mx-auto px-6 py-12">
-    <h1 id="home-title" class="text-6xl font-bold text-center mb-4">LATEST FROM ZAPPA SKATE</h1>
+    <h1 id="home-title" class="text-6xl font-bold text-center mb-4">LATEST FROM THROUH & THROUGH</h1>
     <p id="home-info" class="text-center text-xl mb-12 opacity-80">Built for riders • payment soon • stock drops coming</p><div class="mb-16">
   <h2 id="home-video-heading" class="text-4xl mb-4">Latest YouTube Video</h2>
   <div class="aspect-video bg-black rounded-2xl overflow-hidden border border-white soft-shadow">
@@ -136,7 +136,6 @@
   <p id="auth-error" class="error-text"></p>
 
   <button id="auth-submit-btn" onclick="submitAuth()" class="btn-white w-full text-2xl py-3">LOGIN</button>
-  <p class="text-sm opacity-70 text-center">Admin email only: <span class="font-bold">Zappa.admin</span></p>
 </div>
 
   </section>  <!-- CART BUTTON -->  <button id="cart-fab" onclick="toggleCart()" class="cart-circle fixed bottom-8 right-8 bg-white text-black rounded-full flex items-center justify-center shadow-2xl text-3xl z-50 hover:scale-110 hide">
@@ -315,9 +314,7 @@
       document.getElementById('nav-socials').classList.toggle('tab-active', tabIndex === 2);
       document.getElementById('nav-login').classList.toggle('tab-active', tabIndex === 3);
 
-      if (tabIndex === 3) {
-        renderAuthPage();
-      }
+      if (tabIndex === 3) renderAuthPage();
     }
 
     function switchShopTab(tabIndex) {
@@ -520,15 +517,11 @@
       document.getElementById('login-mode-btn').classList.toggle('text-black', currentAuthMode === 'login');
       document.getElementById('signup-mode-btn').classList.toggle('bg-white', currentAuthMode === 'signup');
       document.getElementById('signup-mode-btn').classList.toggle('text-black', currentAuthMode === 'signup');
-
       document.getElementById('confirm-wrap').classList.toggle('hide', currentAuthMode !== 'signup');
       document.getElementById('username-wrap').classList.toggle('hide', currentAuthMode !== 'signup');
       document.getElementById('auth-submit-btn').textContent = currentAuthMode === 'login' ? 'LOGIN' : 'SIGN UP';
       document.getElementById('auth-error').textContent = '';
-
-      const passHint = document.getElementById('login-password-hint');
-      passHint.textContent = 'Must include 1 capital letter, 1 number, and 1 symbol.';
-      passHint.style.display = 'block';
+      document.getElementById('login-password-hint').textContent = 'Must include 1 capital letter, 1 number, and 1 symbol.';
     }
 
     function setAuthMode(mode) {
@@ -635,10 +628,7 @@
     }
 
     function openAdminPanel() {
-      if (!isAdmin) {
-        alert('Admin access only');
-        return;
-      }
+      if (!isAdmin) return;
       document.getElementById('admin-modal').classList.remove('hidden');
       renderAdminPanel();
     }
@@ -920,16 +910,6 @@ function decrementStock(product) {
   if (hwMatch) hwMatch.stock = Math.max(0, Number(hwMatch.stock || 0) - 1);
 }
 
-function incrementStock(product) {
-  const boardMatch = boards.find((b) => b.id === product.id);
-  if (boardMatch) {
-    boardMatch.stock = Number(boardMatch.stock || 0) + 1;
-    return;
-  }
-  const hwMatch = hardwareList.find((h) => h.id === product.id);
-  if (hwMatch) hwMatch.stock = Number(hwMatch.stock || 0) + 1;
-}
-
 function openProductModal(type, index) {
   selectedModalItem = { type, item: type === 'board' ? boards[index] : hardwareList[index] };
   const item = selectedModalItem.item;
@@ -1074,6 +1054,8 @@ function hideCart() {
   modal.classList.remove('flex');
 }
 
+function openAuthPanel() { switchMainTab(3); }
+
 window.switchMainTab = switchMainTab;
 window.switchShopTab = switchShopTab;
 window.setAuthMode = setAuthMode;
@@ -1101,19 +1083,15 @@ window.removeFromCart = removeFromCart;
 window.proceedCheckout = proceedCheckout;
 window.toggleCart = toggleCart;
 window.hideCart = hideCart;
+window.openAuthPanel = openAuthPanel;
 
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeProductModal();
     hideCart();
-    closeAuthPanelIfNeeded();
     closeAdminPanel();
   }
 });
-
-function closeAuthPanelIfNeeded() {
-  // login is a full page tab now, so no modal to close
-}
 
 window.onload = () => {
   loadState();
