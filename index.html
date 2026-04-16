@@ -1,201 +1,344 @@
-<!DOCTYPE html><html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Through & Through</title>
-<style>
-body { margin:0; font-family: Arial; background:#000; color:#fff; }
-header { text-align:center; padding:20px; }
-nav { display:flex; justify-content:center; gap:30px; margin-bottom:20px; }
-button { cursor:pointer; }
-.card { border:1px solid #fff; padding:10px; margin:10px; }
-.selected { background:#fff; color:#000; }
-#cartPanel { position:fixed; right:0; top:0; width:300px; height:100%; background:#fff; color:#000; padding:10px; display:none; }
-#loginModal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; }
-#loginBox { background:#fff; color:#000; padding:20px; }
-.admin { border:1px solid #fff; padding:10px; margin:10px; }
-</style>
-</head>
-<body><header>
-<h1 id="title">THROUGH & THROUGH</h1>
-<p id="subtitle">built for riders</p>
-</header><nav>
-<button onclick="showTab('home')">Home</button>
-<button onclick="showTab('shop')">Shop</button>
-<button onclick="showTab('socials')">Socials</button>
-</nav><div id="loginArea" style="position:absolute; top:10px; right:10px;"></div><!-- HOME --><div id="home">
-<h2 style="text-align:center;">Ride Everything</h2>
-<p style="text-align:center; opacity:0.6;">Content coming soon</p>
-</div><!-- SHOP --><div id="shop" style="display:none;">
-<div>
-<button onclick="shopTab='boards';renderShop()">Boards</button>
-<button onclick="shopTab='hardware';renderShop()">Hardware</button>
-</div>
-<div id="shopContent"></div>
-<button onclick="addToCart()">Add To Cart</button>
-</div><!-- SOCIALS --><div id="socials" style="display:none; text-align:center;">
-<div id="socialList"></div>
-</div><!-- CART --><button onclick="toggleCart()" style="position:fixed;bottom:10px;right:10px;">🛒</button>
+"use client"; import { useState, useEffect } from "react";
 
-<div id="cartPanel"></div><!-- LOGIN --><div id="loginModal">
-<div id="loginBox">
-<input id="email" placeholder="email"><br>
-<input id="username" placeholder="username"><br>
-<button onclick="login()">login</button>
-</div>
-</div><!-- ADMIN --><div id="adminPanel" class="admin" style="display:none;"></div><script>
-let tab='home';
-let shopTab='boards';
-let cart=[];
-let user=null;
-let admin=false;
-let selectedBoard=null;
-let selectedHardware=null;
+// =============================== // THROUGH & THROUGH FULL BUILD // Original vibe + expanded system // ===============================
 
-let site={title:'THROUGH & THROUGH',subtitle:'built for riders',footer:'website made by zappa',socials:{youtube:'user',instagram:'user',facebook:'user',tiktok:'user'}};
+export default function Home() {
 
-let boards=[{name:'Flame Deck',price:60},{name:'Street Skull',price:55}];
-let hardware=[{name:'Basic',price:20},{name:'Pro',price:35}];
+// ---------------- CORE NAV ---------------- const [tab, setTab] = useState("home"); const [shopTab, setShopTab] = useState("boards");
 
-function save(){
-localStorage.setItem('cart',JSON.stringify(cart));
-localStorage.setItem('user',JSON.stringify(user));
-localStorage.setItem('boards',JSON.stringify(boards));
-localStorage.setItem('hardware',JSON.stringify(hardware));
-localStorage.setItem('site',JSON.stringify(site));
+// ---------------- CART ---------------- const [cart, setCart] = useState([]); const [showCart, setShowCart] = useState(false);
+
+// ---------------- SHOP SELECTION ---------------- const [selectedBoard, setSelectedBoard] = useState(null); const [selectedHardware, setSelectedHardware] = useState(null);
+
+// ---------------- AUTH ---------------- const [user, setUser] = useState(null); const [isAdmin, setIsAdmin] = useState(false); const [authMode, setAuthMode] = useState("login"); // login | signup const [loginOpen, setLoginOpen] = useState(false);
+
+const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [username, setUsername] = useState("");
+
+// ---------------- ADMIN ---------------- const [adminTab, setAdminTab] = useState("site");
+
+// ---------------- SITE DATA ---------------- const [site, setSite] = useState({ title: "THROUGH & THROUGH", subtitle: "built for riders", footer: "website made by zappa | business owned by aiden young", });
+
+const [boards, setBoards] = useState([ { name: "Flame Deck", price: 60, image: "https://via.placeholder.com/150" }, { name: "Street Skull", price: 55, image: "https://via.placeholder.com/150" }, ]);
+
+const [hardware, setHardware] = useState([ { name: "Basic Hardware", price: 20 }, { name: "Pro Hardware", price: 35 }, ]);
+
+// ---------------- USERS (LOCAL AUTH DB) ---------------- const [users, setUsers] = useState([]);
+
+// ---------------- LOAD ---------------- useEffect(() => { const saved = JSON.parse(localStorage.getItem("tt_data") || "{}");
+
+if (saved.users) setUsers(saved.users);
+if (saved.cart) setCart(saved.cart);
+if (saved.site) setSite(saved.site);
+if (saved.boards) setBoards(saved.boards);
+if (saved.hardware) setHardware(saved.hardware);
+
+if (saved.user) {
+  setUser(saved.user);
+  if (saved.user.username === "zappa.admin") setIsAdmin(true);
 }
 
-function load(){
-cart=JSON.parse(localStorage.getItem('cart')||'[]');
-user=JSON.parse(localStorage.getItem('user')||'null');
-boards=JSON.parse(localStorage.getItem('boards')||JSON.stringify(boards));
-hardware=JSON.parse(localStorage.getItem('hardware')||JSON.stringify(hardware));
-site=JSON.parse(localStorage.getItem('site')||JSON.stringify(site));
-if(user && user.username==='zappa.admin') admin=true;
-}
+}, []);
 
-function showTab(t){
-tab=t;
-document.getElementById('home').style.display=t==='home'?'block':'none';
-document.getElementById('shop').style.display=t==='shop'?'block':'none';
-document.getElementById('socials').style.display=t==='socials'?'block':'none';
-render();
-}
+// ---------------- SAVE ---------------- useEffect(() => { localStorage.setItem( "tt_data", JSON.stringify({ users, cart, site, boards, hardware, user }) ); }, [users, cart, site, boards, hardware, user]);
 
-function render(){
-document.getElementById('title').innerText=site.title;
-document.getElementById('subtitle').innerText=site.subtitle;
+// ---------------- AUTH FUNCTIONS ---------------- const signup = () => { if (!email || !password || !username) return alert("fill all fields");
 
-let loginArea=document.getElementById('loginArea');
-loginArea.innerHTML=user? user.username+' <button onclick="logout()">logout</button>' : '<button onclick="openLogin()">login</button>';
+const exists = users.find(u => u.email === email);
+if (exists) return alert("account already exists");
 
-renderShop();
-renderCart();
-renderSocials();
-if(admin) renderAdmin();
-}
+const newUser = { email, password, username };
+const updated = [...users, newUser];
 
-function renderShop(){
-let el=document.getElementById('shopContent');
-el.innerHTML='';
+setUsers(updated);
+setUser(newUser);
 
-if(shopTab==='boards'){
-boards.forEach((b,i)=>{
-let d=document.createElement('div');
-d.className='card'+(selectedBoard===i?' selected':'');
-d.innerHTML=b.name+' $'+b.price+' <button onclick="selectBoard('+i+')">select</button>';
-el.appendChild(d);
-});
-}
+if (username === "zappa.admin") setIsAdmin(true);
 
-if(shopTab==='hardware'){
-hardware.forEach((h,i)=>{
-let d=document.createElement('div');
-d.className='card'+(selectedHardware===i?' selected':'');
-d.innerHTML=h.name+' $'+h.price+' <button onclick="selectHardware('+i+')">select</button>';
-el.appendChild(d);
-});
-}
-}
+setLoginOpen(false);
 
-function selectBoard(i){selectedBoard=i;render();}
-function selectHardware(i){selectedHardware=i;render();}
-
-function addToCart(){
-if(selectedBoard===null) return alert('select board');
-let item={
-name:boards[selectedBoard].name+(selectedHardware!==null?' + '+hardware[selectedHardware].name:''),
-price:boards[selectedBoard].price+(selectedHardware!==null?hardware[selectedHardware].price:0)
 };
-cart.push(item);
-save();
-render();
-}
 
-function renderCart(){
-let el=document.getElementById('cartPanel');
-el.innerHTML='<h3>Cart</h3>';
-let total=0;
-cart.forEach((c,i)=>{
-total+=c.price;
-el.innerHTML+=c.name+' $'+c.price+' <button onclick="removeItem('+i+')">x</button><br>';
-});
-el.innerHTML+='<b>Total: $'+total+'</b><br><button onclick="clearCart()">clear</button>';
-}
+const login = () => { const found = users.find( u => u.email === email && u.password === password );
 
-function removeItem(i){cart.splice(i,1);save();render();}
-function clearCart(){cart=[];save();render();}
+if (!found) return alert("invalid login");
 
-function toggleCart(){
-let el=document.getElementById('cartPanel');
-el.style.display=el.style.display==='block'?'none':'block';
-}
+setUser(found);
+if (found.username === "zappa.admin") setIsAdmin(true);
 
-function openLogin(){document.getElementById('loginModal').style.display='flex';}
+setLoginOpen(false);
 
-function login(){
-user={email:document.getElementById('email').value,username:document.getElementById('username').value};
-if(user.username==='zappa.admin') admin=true;
-document.getElementById('loginModal').style.display='none';
-save();render();
-}
+};
 
-function logout(){user=null;admin=false;save();render();}
+const logout = () => { setUser(null); setIsAdmin(false); };
 
-function renderSocials(){
-let el=document.getElementById('socialList');
-el.innerHTML='';
-Object.keys(site.socials).forEach(k=>{
-el.innerHTML+=k+': '+site.socials[k]+'<br>';
-});
-}
+// ---------------- CART ---------------- const addToCart = () => { if (!selectedBoard) return alert("select board");
 
-function renderAdmin(){
-let el=document.getElementById('adminPanel');
-el.style.display='block';
-el.innerHTML='<h3>Admin</h3>';
+const item = {
+  name:
+    selectedBoard.name +
+    (selectedHardware ? " + " + selectedHardware.name : ""),
+  price: selectedBoard.price + (selectedHardware?.price || 0),
+};
 
-el.innerHTML+='Title:<input value="'+site.title+'" onchange="site.title=this.value;save();render()"><br>';
-el.innerHTML+='Subtitle:<input value="'+site.subtitle+'" onchange="site.subtitle=this.value;save();render()"><br>';
+setCart([...cart, item]);
 
-el.innerHTML+='<h4>Boards</h4>';
-boards.forEach((b,i)=>{
-el.innerHTML+=`<input value="${b.name}" onchange="boards[${i}].name=this.value;save();render()">
-<input type='number' value="${b.price}" onchange="boards[${i}].price=+this.value;save();render()">
-<button onclick="boards.splice(${i},1);save();render()">x</button><br>`;
-});
-el.innerHTML+='<button onclick="boards.push({name:\'new\',price:50});save();render()">+ add</button>';
+};
 
-el.innerHTML+='<h4>Hardware</h4>';
-hardware.forEach((h,i)=>{
-el.innerHTML+=`<input value="${h.name}" onchange="hardware[${i}].name=this.value;save();render()">
-<input type='number' value="${h.price}" onchange="hardware[${i}].price=+this.value;save();render()">
-<button onclick="hardware.splice(${i},1);save();render()">x</button><br>`;
-});
-el.innerHTML+='<button onclick="hardware.push({name:\'new\',price:25});save();render()">+ add</button>';
-}
+const removeItem = (i) => { const copy = [...cart]; copy.splice(i, 1); setCart(copy); };
 
-load();
-render();
-</script></body>
-</html>
+const total = cart.reduce((a, b) => a + b.price, 0);
+
+// ---------------- UI ---------------- return ( <div className="min-h-screen bg-black text-white p-4">
+
+{/* TITLE */}
+  <h1 className="text-5xl font-extrabold text-center tracking-widest">
+    {site.title}
+  </h1>
+  <p className="text-center opacity-60 mb-6">
+    {site.subtitle}
+  </p>
+
+  {/* NAV */}
+  <div className="flex justify-center gap-10 mb-6">
+    <button onClick={() => setTab("home")}>Home</button>
+    <button onClick={() => setTab("shop")}>Shop</button>
+    <button onClick={() => setTab("socials")}>Socials</button>
+  </div>
+
+  {/* AUTH BUTTON */}
+  <div className="absolute top-4 right-4">
+    {user ? (
+      <div>
+        {user.username}
+        <button onClick={logout} className="ml-2">logout</button>
+      </div>
+    ) : (
+      <button onClick={() => setLoginOpen(true)}>login</button>
+    )}
+  </div>
+
+  {/* LOGIN / SIGNUP MODAL */}
+  {loginOpen && (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
+      <div className="bg-white text-black p-6 w-72">
+
+        <div className="flex gap-2 mb-2">
+          <button onClick={() => setAuthMode("login")}>Login</button>
+          <button onClick={() => setAuthMode("signup")}>Sign Up</button>
+        </div>
+
+        <input
+          placeholder="email"
+          className="block mb-2"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          placeholder="password"
+          type="password"
+          className="block mb-2"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        {authMode === "signup" && (
+          <input
+            placeholder="username"
+            className="block mb-2"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        )}
+
+        <button onClick={authMode === "login" ? login : signup}>
+          {authMode}
+        </button>
+
+      </div>
+    </div>
+  )}
+
+  {/* ADMIN PANEL */}
+  {isAdmin && (
+    <div className="border p-4 mb-6">
+      <div className="flex gap-4 mb-3">
+        <button onClick={() => setAdminTab("site")}>Site</button>
+        <button onClick={() => setAdminTab("boards")}>Boards</button>
+        <button onClick={() => setAdminTab("hardware")}>Hardware</button>
+        <button onClick={() => setAdminTab("socials")}>Socials</button>
+      </div>
+
+      {/* SITE EDIT */}
+      {adminTab === "site" && (
+        <div>
+          <input
+            value={site.title}
+            className="text-black"
+            onChange={(e) => setSite({ ...site, title: e.target.value })}
+          />
+
+          <input
+            value={site.subtitle}
+            className="text-black"
+            onChange={(e) => setSite({ ...site, subtitle: e.target.value })}
+          />
+
+          <input
+            value={site.footer}
+            className="text-black"
+            onChange={(e) => setSite({ ...site, footer: e.target.value })}
+          />
+        </div>
+      )}
+
+      {/* BOARDS EDIT (WITH IMAGES) */}
+      {adminTab === "boards" && boards.map((b, i) => (
+        <div key={i}>
+          <input
+            value={b.name}
+            className="text-black"
+            onChange={(e) => {
+              const x = [...boards];
+              x[i].name = e.target.value;
+              setBoards(x);
+            }}
+          />
+
+          <input
+            value={b.image}
+            className="text-black"
+            placeholder="image url"
+            onChange={(e) => {
+              const x = [...boards];
+              x[i].image = e.target.value;
+              setBoards(x);
+            }}
+          />
+
+          <input
+            type="number"
+            value={b.price}
+            className="text-black"
+            onChange={(e) => {
+              const x = [...boards];
+              x[i].price = +e.target.value;
+              setBoards(x);
+            }}
+          />
+
+          <button onClick={() => setBoards(boards.filter((_, idx) => idx !== i))}>x</button>
+        </div>
+      ))}
+
+      {/* HARDWARE EDIT */}
+      {adminTab === "hardware" && hardware.map((h, i) => (
+        <div key={i}>
+          <input
+            value={h.name}
+            className="text-black"
+            onChange={(e) => {
+              const x = [...hardware];
+              x[i].name = e.target.value;
+              setHardware(x);
+            }}
+          />
+
+          <input
+            type="number"
+            value={h.price}
+            className="text-black"
+            onChange={(e) => {
+              const x = [...hardware];
+              x[i].price = +e.target.value;
+              setHardware(x);
+            }}
+          />
+
+          <button onClick={() => setHardware(hardware.filter((_, idx) => idx !== i))}>x</button>
+        </div>
+      ))}
+
+    </div>
+  )}
+
+  {/* CART */}
+  <button
+    className="fixed bottom-5 right-5 bg-white text-black rounded-full w-12 h-12"
+    onClick={() => setShowCart(!showCart)}
+  >
+    🛒
+  </button>
+
+  {showCart && (
+    <div className="fixed bottom-20 right-5 bg-white text-black p-4 w-64">
+      {cart.map((item, i) => (
+        <div key={i}>
+          {item.name} - ${item.price}
+          <button onClick={() => removeItem(i)}>x</button>
+        </div>
+      ))}
+
+      <div className="mt-2">
+        <b>Total: ${total}</b>
+      </div>
+
+      <button className="mt-2" onClick={() => alert("Payment soon - not released yet")}>Checkout</button>
+    </div>
+  )}
+
+  {/* HOME */}
+  {tab === "home" && (
+    <div className="text-center opacity-70">
+      latest videos, posts, and drops coming soon
+    </div>
+  )}
+
+  {/* SHOP */}
+  {tab === "shop" && (
+    <div>
+      <div className="flex gap-4 mb-4">
+        <button onClick={() => setShopTab("boards")}>Boards</button>
+        <button onClick={() => setShopTab("hardware")}>Hardware</button>
+      </div>
+
+      {shopTab === "boards" && boards.map((b, i) => (
+        <div
+          key={i}
+          className={`border p-2 mb-2 ${selectedBoard === b ? "bg-white text-black" : ""}`}
+        >
+          <img src={b.image} alt="board" style={{ width: "100px" }} />
+          <div>{b.name} - ${b.price}</div>
+          <button onClick={() => setSelectedBoard(b)}>Select</button>
+        </div>
+      ))}
+
+      {shopTab === "hardware" && hardware.map((h, i) => (
+        <div
+          key={i}
+          className={`border p-2 mb-2 ${selectedHardware === h ? "bg-white text-black" : ""}`}
+        >
+          {h.name} - ${h.price}
+          <button onClick={() => setSelectedHardware(h)}>Select</button>
+        </div>
+      ))}
+
+      <button onClick={addToCart}>Add To Cart</button>
+    </div>
+  )}
+
+  {/* SOCIALS */}
+  {tab === "socials" && (
+    <div className="text-center">
+      <div>YouTube - {site.socials.youtube}</div>
+      <div>Instagram - {site.socials.instagram}</div>
+      <div>Facebook - {site.socials.facebook}</div>
+      <div>TikTok - {site.socials.tiktok}</div>
+    </div>
+  )}
+
+  {/* FOOTER */}
+  <div className="mt-10 text-center text-sm opacity-60">
+    {site.footer}
+  </div>
+
+</div>
+
+); }
