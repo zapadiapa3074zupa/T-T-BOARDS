@@ -1,344 +1,218 @@
-"use client"; import { useState, useEffect } from "react";
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Through & Through</title>
+<style>body{ margin:0; font-family:Arial,Helvetica,sans-serif; background:#000; color:#fff; }
 
-// =============================== // THROUGH & THROUGH FULL BUILD // Original vibe + expanded system // ===============================
+header{ text-align:center; padding:25px 10px; }
 
-export default function Home() {
+h1{ font-size:52px; letter-spacing:6px; margin:0; }
 
-// ---------------- CORE NAV ---------------- const [tab, setTab] = useState("home"); const [shopTab, setShopTab] = useState("boards");
+nav{ display:flex; justify-content:center; gap:35px; margin:10px 0 20px; }
 
-// ---------------- CART ---------------- const [cart, setCart] = useState([]); const [showCart, setShowCart] = useState(false);
+nav button{ background:none; border:none; color:#fff; font-size:16px; cursor:pointer; }
 
-// ---------------- SHOP SELECTION ---------------- const [selectedBoard, setSelectedBoard] = useState(null); const [selectedHardware, setSelectedHardware] = useState(null);
+nav button:hover{ text-decoration:underline; }
 
-// ---------------- AUTH ---------------- const [user, setUser] = useState(null); const [isAdmin, setIsAdmin] = useState(false); const [authMode, setAuthMode] = useState("login"); // login | signup const [loginOpen, setLoginOpen] = useState(false);
+.container{ max-width:1100px; margin:auto; padding:10px; }
 
-const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [username, setUsername] = useState("");
+/* PRODUCT LIST (SELL AUTH STYLE) */ .product{ display:flex; align-items:center; gap:12px; border:1px solid #fff; border-radius:10px; padding:10px; margin:10px 0; cursor:pointer; transition:0.2s; }
 
-// ---------------- ADMIN ---------------- const [adminTab, setAdminTab] = useState("site");
+.product:hover{ background:#111; }
 
-// ---------------- SITE DATA ---------------- const [site, setSite] = useState({ title: "THROUGH & THROUGH", subtitle: "built for riders", footer: "website made by zappa | business owned by aiden young", });
+.product img{ width:65px; height:65px; object-fit:cover; border-radius:8px; }
 
-const [boards, setBoards] = useState([ { name: "Flame Deck", price: 60, image: "https://via.placeholder.com/150" }, { name: "Street Skull", price: 55, image: "https://via.placeholder.com/150" }, ]);
+.product-info{ display:flex; flex-direction:column; flex:1; }
 
-const [hardware, setHardware] = useState([ { name: "Basic Hardware", price: 20 }, { name: "Pro Hardware", price: 35 }, ]);
+.small{ opacity:0.7; }
 
-// ---------------- USERS (LOCAL AUTH DB) ---------------- const [users, setUsers] = useState([]);
+.btn{ background:#fff; color:#000; border:none; padding:6px 10px; cursor:pointer; margin-top:5px; border-radius:5px; }
 
-// ---------------- LOAD ---------------- useEffect(() => { const saved = JSON.parse(localStorage.getItem("tt_data") || "{}");
+/* CART */ #cartBtn{ position:fixed; bottom:15px; right:15px; width:55px; height:55px; border-radius:50%; background:#fff; border:none; font-size:18px; cursor:pointer; }
 
-if (saved.users) setUsers(saved.users);
-if (saved.cart) setCart(saved.cart);
-if (saved.site) setSite(saved.site);
-if (saved.boards) setBoards(saved.boards);
-if (saved.hardware) setHardware(saved.hardware);
+#cartPanel{ position:fixed; right:0; top:0; width:320px; height:100%; background:#fff; color:#000; display:none; padding:10px; overflow:auto; }
 
-if (saved.user) {
-  setUser(saved.user);
-  if (saved.user.username === "zappa.admin") setIsAdmin(true);
+/* MODAL */ #modal{ position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; }
+
+#modalBox{ background:#fff; color:#000; padding:20px; width:320px; border-radius:10px; }
+
+/* LOGIN */ #loginBox{ position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; }
+
+#loginInner{ background:#fff; color:#000; padding:20px; width:280px; border-radius:10px; }
+
+input{ display:block; width:100%; margin:6px 0; padding:6px; }
+
+/* ADMIN */ .admin{ border:1px solid #fff; margin:10px; padding:10px; }
+
+.admin-section{ margin-top:10px; }
+
+</style>
+</head>
+<body><header>
+<h1 id="title">THROUGH & THROUGH</h1>
+<div class="small" id="subtitle">built for riders</div>
+</header><nav>
+<button onclick="setTab('home')">Home</button>
+<button onclick="setTab('shop')">Shop</button>
+<button onclick="setTab('socials')">Socials</button>
+</nav><!-- LOGIN BUTTON --><div style="position:absolute;top:10px;right:10px">
+<button onclick="openLogin()">Login</button>
+</div><div class="container"><!-- HOME --><div id="home">
+<div class="product">
+<div class="product-info">
+<b>Latest Drops</b>
+<div class="small">videos, posts, skate clips coming soon</div>
+</div>
+</div>
+</div><!-- SHOP --><div id="shop" style="display:none"><div style="display:flex;gap:10px;margin-bottom:10px">
+<button onclick="shopTab='boards';renderShop()">Boards</button>
+<button onclick="shopTab='hardware';renderShop()">Hardware</button>
+</div><div id="shopArea"></div></div><!-- SOCIALS --><div id="socials" style="display:none">
+<div class="product">
+<div class="product-info" id="socialArea"></div>
+</div>
+</div></div><!-- CART --><button id="cartBtn" onclick="toggleCart()">🛒</button>
+
+<div id="cartPanel"></div><!-- MODAL PRODUCT --><div id="modal" onclick="closeModal(event)">
+  <div id="modalBox"></div>
+</div><!-- LOGIN --><div id="loginBox">
+  <div id="loginInner">
+    <h3>Login / Sign Up</h3>
+    <input id="email" placeholder="email" />
+    <input id="password" placeholder="password" />
+    <input id="username" placeholder="username" />
+    <button onclick="login()">Enter</button>
+  </div>
+</div><!-- ADMIN --><div id="adminPanel" class="admin" style="display:none"></div><script>
+
+let tab='home';
+let shopTab='boards';
+let cart=[];
+let user=null;
+let admin=false;
+let selected=null;
+
+let site={
+  title:'THROUGH & THROUGH',
+  subtitle:'built for riders',
+  footer:'website made by zappa | business owned by aiden young',
+  socials:{youtube:'user',instagram:'user',tiktok:'user',facebook:'user'}
+};
+
+let boards=[
+  {name:'Flame Deck',price:60,img:'https://via.placeholder.com/150'},
+  {name:'Skull Deck',price:55,img:'https://via.placeholder.com/150'}
+];
+
+let hardware=[
+  {name:'Basic Trucks',price:20,img:'https://via.placeholder.com/150'},
+  {name:'Pro Trucks',price:35,img:'https://via.placeholder.com/150'}
+];
+
+function setTab(t){
+  tab=t;
+  document.getElementById('home').style.display=t==='home'?'block':'none';
+  document.getElementById('shop').style.display=t==='shop'?'block':'none';
+  document.getElementById('socials').style.display=t==='socials'?'block':'none';
+  renderShop();
 }
 
-}, []);
+function renderShop(){
+  let list=document.getElementById('shopArea');
+  list.innerHTML='';
 
-// ---------------- SAVE ---------------- useEffect(() => { localStorage.setItem( "tt_data", JSON.stringify({ users, cart, site, boards, hardware, user }) ); }, [users, cart, site, boards, hardware, user]);
+  let items=shopTab==='boards'?boards:hardware;
 
-// ---------------- AUTH FUNCTIONS ---------------- const signup = () => { if (!email || !password || !username) return alert("fill all fields");
-
-const exists = users.find(u => u.email === email);
-if (exists) return alert("account already exists");
-
-const newUser = { email, password, username };
-const updated = [...users, newUser];
-
-setUsers(updated);
-setUser(newUser);
-
-if (username === "zappa.admin") setIsAdmin(true);
-
-setLoginOpen(false);
-
-};
-
-const login = () => { const found = users.find( u => u.email === email && u.password === password );
-
-if (!found) return alert("invalid login");
-
-setUser(found);
-if (found.username === "zappa.admin") setIsAdmin(true);
-
-setLoginOpen(false);
-
-};
-
-const logout = () => { setUser(null); setIsAdmin(false); };
-
-// ---------------- CART ---------------- const addToCart = () => { if (!selectedBoard) return alert("select board");
-
-const item = {
-  name:
-    selectedBoard.name +
-    (selectedHardware ? " + " + selectedHardware.name : ""),
-  price: selectedBoard.price + (selectedHardware?.price || 0),
-};
-
-setCart([...cart, item]);
-
-};
-
-const removeItem = (i) => { const copy = [...cart]; copy.splice(i, 1); setCart(copy); };
-
-const total = cart.reduce((a, b) => a + b.price, 0);
-
-// ---------------- UI ---------------- return ( <div className="min-h-screen bg-black text-white p-4">
-
-{/* TITLE */}
-  <h1 className="text-5xl font-extrabold text-center tracking-widest">
-    {site.title}
-  </h1>
-  <p className="text-center opacity-60 mb-6">
-    {site.subtitle}
-  </p>
-
-  {/* NAV */}
-  <div className="flex justify-center gap-10 mb-6">
-    <button onClick={() => setTab("home")}>Home</button>
-    <button onClick={() => setTab("shop")}>Shop</button>
-    <button onClick={() => setTab("socials")}>Socials</button>
-  </div>
-
-  {/* AUTH BUTTON */}
-  <div className="absolute top-4 right-4">
-    {user ? (
-      <div>
-        {user.username}
-        <button onClick={logout} className="ml-2">logout</button>
+  items.forEach((p,i)=>{
+    list.innerHTML+=`
+      <div class='product' onclick='openProduct("${shopTab}",${i})'>
+        <img src='${p.img||"https://via.placeholder.com/150"}' />
+        <div class='product-info'>
+          <b>${p.name}</b>
+          <div>$${p.price}</div>
+        </div>
       </div>
-    ) : (
-      <button onClick={() => setLoginOpen(true)}>login</button>
-    )}
-  </div>
+    `;
+  });
+}
 
-  {/* LOGIN / SIGNUP MODAL */}
-  {loginOpen && (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
-      <div className="bg-white text-black p-6 w-72">
+function openProduct(type,i){
+  let item=type==='boards'?boards[i]:hardware[i];
+  selected=item;
 
-        <div className="flex gap-2 mb-2">
-          <button onClick={() => setAuthMode("login")}>Login</button>
-          <button onClick={() => setAuthMode("signup")}>Sign Up</button>
-        </div>
+  document.getElementById('modalBox').innerHTML=`
+    <h3>${item.name}</h3>
+    <img src='${item.img||"https://via.placeholder.com/150"}' style='width:100%;border-radius:8px'/>
+    <p>Price: $${item.price}</p>
+    <button onclick='addToCart()'>Add to Cart</button>
+    <button onclick='payNow()'>Pay Now</button>
+  `;
 
-        <input
-          placeholder="email"
-          className="block mb-2"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+  document.getElementById('modal').style.display='flex';
+}
 
-        <input
-          placeholder="password"
-          type="password"
-          className="block mb-2"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+function closeModal(e){
+  if(e.target.id==='modal') document.getElementById('modal').style.display='none';
+}
 
-        {authMode === "signup" && (
-          <input
-            placeholder="username"
-            className="block mb-2"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        )}
+function addToCart(){
+  cart.push(selected);
+  alert('Added to cart');
+}
 
-        <button onClick={authMode === "login" ? login : signup}>
-          {authMode}
-        </button>
+function payNow(){
+  alert('Payment soon - not released yet');
+}
 
-      </div>
-    </div>
-  )}
+function toggleCart(){
+  let c=document.getElementById('cartPanel');
+  c.style.display=c.style.display==='block'?'none':'block';
+  renderCart();
+}
 
-  {/* ADMIN PANEL */}
-  {isAdmin && (
-    <div className="border p-4 mb-6">
-      <div className="flex gap-4 mb-3">
-        <button onClick={() => setAdminTab("site")}>Site</button>
-        <button onClick={() => setAdminTab("boards")}>Boards</button>
-        <button onClick={() => setAdminTab("hardware")}>Hardware</button>
-        <button onClick={() => setAdminTab("socials")}>Socials</button>
-      </div>
+function renderCart(){
+  let c=document.getElementById('cartPanel');
+  let total=0;
+  c.innerHTML='<h3>Cart</h3>';
 
-      {/* SITE EDIT */}
-      {adminTab === "site" && (
-        <div>
-          <input
-            value={site.title}
-            className="text-black"
-            onChange={(e) => setSite({ ...site, title: e.target.value })}
-          />
+  cart.forEach((i,idx)=>{
+    total+=i.price;
+    c.innerHTML+=`${i.name} $${i.price} <button onclick='removeItem(${idx})'>x</button><br>`;
+  });
 
-          <input
-            value={site.subtitle}
-            className="text-black"
-            onChange={(e) => setSite({ ...site, subtitle: e.target.value })}
-          />
+  c.innerHTML+=`<hr>Total: $${total}<br><button onclick='payNow()'>Pay Now</button>`;
+}
 
-          <input
-            value={site.footer}
-            className="text-black"
-            onChange={(e) => setSite({ ...site, footer: e.target.value })}
-          />
-        </div>
-      )}
+function removeItem(i){cart.splice(i,1);renderCart();}
 
-      {/* BOARDS EDIT (WITH IMAGES) */}
-      {adminTab === "boards" && boards.map((b, i) => (
-        <div key={i}>
-          <input
-            value={b.name}
-            className="text-black"
-            onChange={(e) => {
-              const x = [...boards];
-              x[i].name = e.target.value;
-              setBoards(x);
-            }}
-          />
+function openLogin(){document.getElementById('loginBox').style.display='flex';}
 
-          <input
-            value={b.image}
-            className="text-black"
-            placeholder="image url"
-            onChange={(e) => {
-              const x = [...boards];
-              x[i].image = e.target.value;
-              setBoards(x);
-            }}
-          />
+function login(){
+  user={email:email.value,password:password.value,username:username.value};
+  if(user.username==='zappa.admin')admin=true;
+  document.getElementById('loginBox').style.display='none';
+  renderAdmin();
+}
 
-          <input
-            type="number"
-            value={b.price}
-            className="text-black"
-            onChange={(e) => {
-              const x = [...boards];
-              x[i].price = +e.target.value;
-              setBoards(x);
-            }}
-          />
+function renderAdmin(){
+  if(!admin)return;
+  let a=document.getElementById('adminPanel');
+  a.style.display='block';
+  a.innerHTML='<h3>Admin Panel</h3>';
 
-          <button onClick={() => setBoards(boards.filter((_, idx) => idx !== i))}>x</button>
-        </div>
-      ))}
+  a.innerHTML+='<h4>Boards</h4>';
+  boards.forEach((b,i)=>{
+    a.innerHTML+=`<input value='${b.name}' onchange="boards[${i}].name=this.value"><input value='${b.price}' onchange="boards[${i}].price=+this.value"><input value='${b.img}' onchange="boards[${i}].img=this.value"><br>`;
+  });
 
-      {/* HARDWARE EDIT */}
-      {adminTab === "hardware" && hardware.map((h, i) => (
-        <div key={i}>
-          <input
-            value={h.name}
-            className="text-black"
-            onChange={(e) => {
-              const x = [...hardware];
-              x[i].name = e.target.value;
-              setHardware(x);
-            }}
-          />
+  a.innerHTML+='<h4>Hardware</h4>';
+  hardware.forEach((h,i)=>{
+    a.innerHTML+=`<input value='${h.name}' onchange="hardware[${i}].name=this.value"><input value='${h.price}' onchange="hardware[${i}].price=+this.value"><input value='${h.img}' onchange="hardware[${i}].img=this.value"><br>`;
+  });
+}
 
-          <input
-            type="number"
-            value={h.price}
-            className="text-black"
-            onChange={(e) => {
-              const x = [...hardware];
-              x[i].price = +e.target.value;
-              setHardware(x);
-            }}
-          />
+renderShop();
 
-          <button onClick={() => setHardware(hardware.filter((_, idx) => idx !== i))}>x</button>
-        </div>
-      ))}
-
-    </div>
-  )}
-
-  {/* CART */}
-  <button
-    className="fixed bottom-5 right-5 bg-white text-black rounded-full w-12 h-12"
-    onClick={() => setShowCart(!showCart)}
-  >
-    🛒
-  </button>
-
-  {showCart && (
-    <div className="fixed bottom-20 right-5 bg-white text-black p-4 w-64">
-      {cart.map((item, i) => (
-        <div key={i}>
-          {item.name} - ${item.price}
-          <button onClick={() => removeItem(i)}>x</button>
-        </div>
-      ))}
-
-      <div className="mt-2">
-        <b>Total: ${total}</b>
-      </div>
-
-      <button className="mt-2" onClick={() => alert("Payment soon - not released yet")}>Checkout</button>
-    </div>
-  )}
-
-  {/* HOME */}
-  {tab === "home" && (
-    <div className="text-center opacity-70">
-      latest videos, posts, and drops coming soon
-    </div>
-  )}
-
-  {/* SHOP */}
-  {tab === "shop" && (
-    <div>
-      <div className="flex gap-4 mb-4">
-        <button onClick={() => setShopTab("boards")}>Boards</button>
-        <button onClick={() => setShopTab("hardware")}>Hardware</button>
-      </div>
-
-      {shopTab === "boards" && boards.map((b, i) => (
-        <div
-          key={i}
-          className={`border p-2 mb-2 ${selectedBoard === b ? "bg-white text-black" : ""}`}
-        >
-          <img src={b.image} alt="board" style={{ width: "100px" }} />
-          <div>{b.name} - ${b.price}</div>
-          <button onClick={() => setSelectedBoard(b)}>Select</button>
-        </div>
-      ))}
-
-      {shopTab === "hardware" && hardware.map((h, i) => (
-        <div
-          key={i}
-          className={`border p-2 mb-2 ${selectedHardware === h ? "bg-white text-black" : ""}`}
-        >
-          {h.name} - ${h.price}
-          <button onClick={() => setSelectedHardware(h)}>Select</button>
-        </div>
-      ))}
-
-      <button onClick={addToCart}>Add To Cart</button>
-    </div>
-  )}
-
-  {/* SOCIALS */}
-  {tab === "socials" && (
-    <div className="text-center">
-      <div>YouTube - {site.socials.youtube}</div>
-      <div>Instagram - {site.socials.instagram}</div>
-      <div>Facebook - {site.socials.facebook}</div>
-      <div>TikTok - {site.socials.tiktok}</div>
-    </div>
-  )}
-
-  {/* FOOTER */}
-  <div className="mt-10 text-center text-sm opacity-60">
-    {site.footer}
-  </div>
-
-</div>
-
-); }
+</script></body>
+</html>
